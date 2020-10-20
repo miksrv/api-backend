@@ -53,7 +53,7 @@ class Set extends BaseController
 
         $response = ['state' => TRUE, 'data' => 'Data accepted'];
 
-        log_message('notice', '[' .  __METHOD__ . '] Data inserted: ' . $this->rawInput);
+        // log_message('notice', '[' .  __METHOD__ . '] Data inserted: ' . $this->rawInput);
 
         $this->_response($response, 200);
     }
