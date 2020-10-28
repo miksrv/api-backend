@@ -11,6 +11,7 @@ class Get extends BaseController
     protected $_period = ['today', 'yesterday', 'week', 'month'];
 
     /**
+     * DEPRECATED
      * Receives data from a weather station, checks a token, enters data into a storage
      */
     public function general()
@@ -34,20 +35,34 @@ class Get extends BaseController
     }
 
     /**
+     * Return current meteo params + trend
+     */
+    public function meteo_general()
+    {
+        helper(['transform', 'calculate']);
+
+        $param = [
+            'dataset' => ( ! empty($this->request->getGet('dataset')) ? explode(',', $this->request->getGet('dataset')) : ['t1']),
+        ];
+
+        $WeatherGeneral = new \WeatherGeneral();
+        $generalData    = $WeatherGeneral->get_general($param);
+
+        $this->response
+            ->setJSON([
+                'period'  => $generalData->period,
+                'update'  => strtotime($generalData->update),
+                'sensors' => $generalData->data
+            ])->send();
+
+        exit();
+    }
+
+    /**
      * Weather forecast from OpenWeatherMap service
      */
     public function statistic()
     {
-        /**
-         * p - pressure
-         * t1, t2 - temperature
-         * h - humidity
-         * uv - uv data
-         * lux - illumination
-         * ws - wind speed
-         * dp - dew point temperature
-         * wd - wind directions intensity
-         */
         $param = [
             'dataset' => ( ! empty($this->request->getGet('dataset')) ? explode(',', $this->request->getGet('dataset')) : ['t1']),
             'period'  => $this->request->getGet('period')
@@ -107,18 +122,6 @@ class Get extends BaseController
 
 
 
-
-
-    /**
-     * Return calculated dew point value by temperature and humidity
-     * @param $humidity float
-     * @param $temp float
-     * @return false|float
-     */
-    protected function _calc_dew_point($humidity, $temp)
-    {
-        return round(((pow(($humidity / 100), 0.125)) * (112 + 0.9 * $temp) + (0.1 * $temp) - 112),1);
-    }
 
     /**
      * Inserted some data in first sensors array elements
@@ -226,6 +229,8 @@ class Get extends BaseController
 
             foreach (json_decode($item->item_raw_data) as $sensorKey => $sensorVal)
             {
+                if ($sensorKey == 'ma' || $sensorKey == 'mo') continue;
+
                 $temp[$sensorKey]->min = $sensorVal < $temp[$sensorKey]->min ? $sensorVal : $temp[$sensorKey]->min;
                 $temp[$sensorKey]->max = $sensorVal > $temp[$sensorKey]->max ? $sensorVal : $temp[$sensorKey]->max;
 

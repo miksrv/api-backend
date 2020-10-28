@@ -24,7 +24,7 @@ class NooaData {
 
             if ($response->getStatusCode() !== 200)
             {
-                log_message('error', '[' .  __METHOD__ . '] Data error: ' . $foreacst->data);
+                log_message('error', '[' .  __METHOD__ . '] Data error: ' . $response->data);
 
                 return (object) [
                     'status' => false,

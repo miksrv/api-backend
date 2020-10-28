@@ -16,7 +16,7 @@ class SensorData extends Model
     {
         parent::__construct($db, $validation);
 
-        $this->table = getenv('database.table.data');
+        $this->table = getenv('database.table.weather_data');
     }
 
     /**
@@ -33,10 +33,8 @@ class SensorData extends Model
             case 'month'     : $period = 'DATE_SUB(NOW(), INTERVAL 30 DAY)'; break;
         }
 
-        $interval = '`item_timestamp` >= ' . $period;
-
         return $this->db->table($this->table)
-                    ->where($interval)
+                    ->where('`item_timestamp` >= ' . $period)
                     ->orderBy('item_timestamp', 'DESC')
                     ->get()
                     ->getResult();

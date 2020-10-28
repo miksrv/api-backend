@@ -32,7 +32,7 @@ class Set extends BaseController
      */
     public function data()
     {
-        $_dataTable = getenv('database.table.data');
+        $_dataTable = getenv('database.table.weather_data');
 
         $this->_select_source();
         $this->_check_token();
@@ -50,6 +50,27 @@ class Set extends BaseController
         ]);
 
         $this->_narodmon($this->rawData);
+
+        $response = ['state' => TRUE, 'data' => 'Data accepted'];
+
+        // log_message('notice', '[' .  __METHOD__ . '] Data inserted: ' . $this->rawInput);
+
+        $this->_response($response, 200);
+    }
+
+    function astro_sensor() {
+        $_dataTable = getenv('database.table.astro_sensors');
+
+        $this->_select_source();
+        $this->_check_token();
+        $this->_fetch_data();
+
+        $db = \Config\Database::connect();
+        $db->table($_dataTable)->insert([
+            'item_id'        => uniqid(),
+            'item_raw_data'  => json_encode($this->rawData),
+            'item_timestamp' => date("Y-m-d H:i:s")
+        ]);
 
         $response = ['state' => TRUE, 'data' => 'Data accepted'];
 
