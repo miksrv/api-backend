@@ -59,7 +59,7 @@ class Set extends BaseController
     }
 
     function astro_sensor() {
-        $_dataTable = getenv('database.table.astro_sensors');
+        $_dataTable = getenv('database.table.astro_data');
 
         $this->_select_source();
         $this->_check_token();
