@@ -5,12 +5,20 @@ class Relay extends BaseController
     protected $_cmd_set = 5;
     protected $_cmd_get = 10;
 
+    /**
+     * Get current controller status
+     */
     function get_status()
     {
         $client = \Config\Services::curlrequest();
-        return $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_get);
+        $response = $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_get);
+
+        $this->_response($response->getBody(), $response->getStatusCode(), __METHOD__);
     }
 
+    /**
+     * Set relay pin status
+     */
     function set()
     {
         $device = $this->request->getGet('device');
@@ -19,21 +27,40 @@ class Relay extends BaseController
         if ( ! $device || !$status)
         {
             log_message('error', '[' .  __METHOD__ . '] Empty $device (' . $device . ') or $status (' . $status . ')');
-            return $this->response(['status' => false]);
+            $this->_response('', 400, __METHOD__);
         }
 
         log_message('info', '[' .  __METHOD__ . '] Set device (' . $device . ') status (' . $status . ')');
 
         $client = \Config\Services::curlrequest();
-        return $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_set . '&pin=' . $device . '&set=' . $status);
+        $response = $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_set . '&pin=' . $device . '&set=' . $status);
+
+        $this->_response($response->getBody(), $response->getStatusCode(), __METHOD__);
     }
 
-
-    protected function _response($data, $code = 400)
+    /**
+     * JSON response
+     * @param $data string
+     * @param int $code HTTP string code
+     * @param $method class method
+     * @return \CodeIgniter\HTTP\Response
+     */
+    protected function _response($data, $code = 400, $method)
     {
+        if ($code !== 200)
+        {
+            $response = ['status' => false, 'data' => json_decode($data)];
+
+            log_message('error', '[' .  $method . '] Data error: ' . $data);
+        }
+        else
+        {
+            $response = ['status' => true, 'data' => json_decode($data)];
+        }
+
         return $this->response
             ->setStatusCode($code)
-            ->setJSON($data)
+            ->setJSON($response)
             ->send();
     }
 }
