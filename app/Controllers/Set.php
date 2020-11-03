@@ -32,7 +32,7 @@ class Set extends BaseController
      */
     public function data()
     {
-        $_dataTable = getenv('database.table.weather_data');
+        $_dataTable = getenv('database.table.meteo_data');
 
         $this->_select_source();
         $this->_check_token();
@@ -61,6 +61,8 @@ class Set extends BaseController
     function astro_sensor() {
         $_dataTable = getenv('database.table.astro_data');
 
+        log_message('notice', '[' .  __METHOD__ . '] Data inserted: ');
+
         $this->_select_source();
         $this->_check_token();
         $this->_fetch_data();
@@ -74,7 +76,7 @@ class Set extends BaseController
 
         $response = ['state' => TRUE, 'data' => 'Data accepted'];
 
-        // log_message('notice', '[' .  __METHOD__ . '] Data inserted: ' . $this->rawInput);
+
 
         $this->_response($response, 200);
     }

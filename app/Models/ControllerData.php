@@ -4,7 +4,7 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
-class SensorData extends Model
+class ControllerData extends Model
 {
     protected $table      = '';
     protected $primaryKey = 'item_id';
@@ -15,6 +15,8 @@ class SensorData extends Model
     public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
         parent::__construct($db, $validation);
+
+        $this->table = getenv('database.table.astro_data');
     }
 
     /**
@@ -22,10 +24,8 @@ class SensorData extends Model
      * #TODO Optimize
      * @return mixed
      */
-    public function get_period($source = 'meteo', $period = 'today')
+    public function get_period($period = 'today')
     {
-        $this->table = getenv('database.table.' . $source . '_data');
-
         switch ($period) {
             case 'today'     : $period = 'DATE_SUB(NOW(), INTERVAL 1 DAY)'; break;
             case 'yesterday' : $period = 'CURDATE() - INTERVAL 1 DAY'; break;

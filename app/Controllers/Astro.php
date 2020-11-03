@@ -17,9 +17,8 @@ class Astro extends BaseController
         $request = \Config\Services::request();
         $RAWData = $request->getJSON();
 
-        if ( ! is_object($RAWData) || ! isset($RAWData->OBJECT))
-        {
-            log_message('error', '[' .  __METHOD__ . '] Empty RAW data (' . json_encode($RAWData) . ')');
+        if (!is_object($RAWData) || !isset($RAWData->OBJECT)) {
+            log_message('error', '[' . __METHOD__ . '] Empty RAW data (' . json_encode($RAWData) . ')');
 
             return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
         }
@@ -28,6 +27,26 @@ class Astro extends BaseController
         $FITLibrary->create_fit_array($RAWData);
         $FITLibrary->save_fit();
 
-        return $this->response->setJSON(['status' => true])->send();
+        $this->response->setJSON(['status' => true])->send();
+    }
+
+    function get($action)
+    {
+        $Sensors = new \Sensors(['source' => 'astro']);
+
+        switch ($action)
+        {
+            case 'summary'   : $summary = $Sensors->summary(); break;
+            case 'statistic' : $summary = $Sensors->statistic(); break;
+
+            default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $this->response
+            ->setJSON([
+                'period'  => $summary->period,
+                'update'  => strtotime($summary->update),
+                'sensors' => $summary->data
+            ])->send();
     }
 }

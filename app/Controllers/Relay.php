@@ -13,6 +13,8 @@ class Relay extends BaseController
         $client = \Config\Services::curlrequest();
         $response = $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_get);
 
+        var_dump($response->getBody());
+
         $this->_response($response->getBody(), $response->getStatusCode(), __METHOD__);
     }
 
