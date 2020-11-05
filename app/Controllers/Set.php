@@ -61,8 +61,6 @@ class Set extends BaseController
     function astro_sensor() {
         $_dataTable = getenv('database.table.astro_data');
 
-        log_message('notice', '[' .  __METHOD__ . '] Data inserted: ');
-
         $this->_select_source();
         $this->_check_token();
         $this->_fetch_data();
@@ -75,8 +73,6 @@ class Set extends BaseController
         ]);
 
         $response = ['state' => TRUE, 'data' => 'Data accepted'];
-
-
 
         $this->_response($response, 200);
     }

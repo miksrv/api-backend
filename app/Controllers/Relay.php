@@ -8,12 +8,10 @@ class Relay extends BaseController
     /**
      * Get current controller status
      */
-    function get_status()
+    function get()
     {
         $client = \Config\Services::curlrequest();
         $response = $client->get(getenv('app.observatory.url') . '?command=' . $this->_cmd_get);
-
-        var_dump($response->getBody());
 
         $this->_response($response->getBody(), $response->getStatusCode(), __METHOD__);
     }
@@ -23,10 +21,10 @@ class Relay extends BaseController
      */
     function set()
     {
-        $device = $this->request->getGet('device');
-        $status = $this->request->getGet('status');
+        $device = (int) $this->request->getGet('device');
+        $status = (int) $this->request->getGet('status');
 
-        if ( ! $device || !$status)
+        if ($device === '' || $status === '')
         {
             log_message('error', '[' .  __METHOD__ . '] Empty $device (' . $device . ') or $status (' . $status . ')');
             $this->_response('', 400, __METHOD__);
@@ -60,9 +58,11 @@ class Relay extends BaseController
             $response = ['status' => true, 'data' => json_decode($data)];
         }
 
-        return $this->response
+        $this->response
             ->setStatusCode($code)
             ->setJSON($response)
             ->send();
+
+        exit();
     }
 }
