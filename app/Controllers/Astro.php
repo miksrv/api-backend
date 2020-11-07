@@ -1,5 +1,9 @@
 <?php namespace App\Controllers;
 
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+
+
 /**
  * Class Astro
  * Working with astronomical images (FITS)
