@@ -16,7 +16,7 @@ class Astro extends BaseController
      * which are saved to the database
      * @return \CodeIgniter\HTTP\Response
      */
-    function set_fit()
+    function fit()
     {
         $request = \Config\Services::request();
         $RAWData = $request->getJSON();
