@@ -24,7 +24,7 @@ class WeatherStat {
         $period    = ( ! isset($param['period']) || ! in_array($param['period'], $this->_period)) ? $this->_period[0] : $param['period'];
 
         $this->_dataset = $param['dataset'];
-        $this->_data    = $dataModel->get_period($period);
+        $this->_data    = $dataModel->get_period('meteo', $period);
 
         if (empty($this->_data))
         {

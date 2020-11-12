@@ -24,7 +24,7 @@ class WeatherGeneral {
         $dataModel = model('App\Models\SensorData');
 
         $this->_dataset = $param['dataset'];
-        $this->_data    = $dataModel->get_period($period);
+        $this->_data    = $dataModel->get_period('meteo', $period);
 
         if (empty($this->_data))
         {
