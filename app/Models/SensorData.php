@@ -6,9 +6,7 @@ use CodeIgniter\Validation\ValidationInterface;
 
 class SensorData extends Model
 {
-    protected $table      = '';
-    protected $primaryKey = 'item_id';
-    protected $returnType = 'object';
+    protected $table = '';
 
     protected $db;
 
