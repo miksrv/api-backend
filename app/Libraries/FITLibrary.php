@@ -46,6 +46,10 @@ class FITLibrary
             'item_bzero'     => intval($data->BZERO),
             'item_extend'    => $data->EXTEND,
             'item_airmass'   => floatval($data->AIRMASS),
+
+            'item_hfr'   => isset($data->HFR) ? floatval($data->HFR) : NULL,
+            'item_fwhm'  => isset($data->FWHM_INFO) ? floatval($data->FWHM_INFO->FWHM) : NULL,
+            'item_sigma' => isset($data->FWHM_INFO) ? floatval($data->FWHM_INFO->SIGMA) : NULL,
         ];
     }
 
