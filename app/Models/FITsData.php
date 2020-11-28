@@ -23,4 +23,18 @@ class FITsData extends Model
     {
         return $this->db->table($this->table)->insert($data);
     }
+
+    function get_all()
+    {
+        return $this->db->table($this->table)->get()->getResult();
+    }
+
+    function get_by_name($name)
+    {
+        return $this->db
+                ->table($this->table)
+                ->orderBy('item_date_obs', 'DESC')
+                ->getWhere(['item_object' => $name])
+                ->getResult();
+    }
 }

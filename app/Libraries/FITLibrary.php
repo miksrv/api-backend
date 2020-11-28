@@ -4,6 +4,9 @@ class FITLibrary
 {
     protected $fit_header = [];
 
+    // FIT file size in byte for 16 bit mask
+    const FIT_FILE_SIZE = 32785920;
+
     function create_fit_array($data)
     {
         return $this->fit_header = [
@@ -68,5 +71,95 @@ class FITLibrary
         $dataModel->add_fit($data);
 
         return true;
+    }
+
+
+    /**
+     * Creates a summary array of objects and general statistics for frames, exposure
+     * @return object
+     */
+    public function statistics()
+    {
+        helper(['transform']);
+
+        $dataModel = model('App\Models\FITsData');
+        $dataFITs  = $dataModel->get_all();
+
+        $total_frame = $total_exp = 0;
+
+        $objects  = [];
+        $template = [
+            'name'  => '',
+            'total' => 0,
+            'frame' => 0,
+            'l' => 0,
+            'r' => 0,
+            'g' => 0,
+            'b' => 0,
+            'h' => 0,
+            'o' => 0,
+            's' => 0,
+        ];
+        $filter_map = [
+            'Luminance' => 'l', 'Red' => 'r', 'Green' => 'g',
+            'Blue' => 'b', 'Ha' => 'h', 'OIII' => 'o', 'SII' => 's'
+        ];
+
+        foreach ($dataFITs as $key => $row)
+        {
+
+            if ($row->item_frame != 'Light') {
+                continue;
+            }
+
+            $total_exp   += $row->item_exptime;
+            $total_frame += 1;
+
+            $key = array_search($row->item_object, array_column($objects, 'name'));
+
+            if ($key === false)
+            {
+                $_tmp = $template;
+                $_tmp['name'] = $row->item_object;
+
+                $objects[] = $_tmp;
+
+                end($objects);
+
+                $key = key($objects);
+            }
+
+            $objects[$key]['total'] += $row->item_exptime;
+            $objects[$key]['frame'] += 1;
+
+            $objects[$key][ $filter_map[$row->item_filter] ] += $row->item_exptime;
+        }
+
+        return (object) [
+            'statistic' => $objects,
+            'frames'    => $total_frame,
+            'exposure'  => $total_exp,
+            'filesize'  => format_bytes(count($objects) * self::FIT_FILE_SIZE, 'gb'),
+            'objects'   => count($objects)
+        ];
+    }
+
+    function statistics_object($name) {
+        $dataModel = model('App\Models\FITsData');
+        $dataFITs  = $dataModel->get_by_name($name);
+        $total_exp = 0;
+
+        foreach ($dataFITs as $row)
+        {
+            $total_exp += $row->item_exptime;
+        }
+
+        return (object) [
+            'result'   => count($dataFITs) > 0 ? true : false,
+            'data'     => $dataFITs,
+            'exposure' => $total_exp,
+            'filesize' => format_bytes(count($dataFITs) * self::FIT_FILE_SIZE, 'gb'),
+            'frames'   => count($dataFITs)
+        ];
     }
 }

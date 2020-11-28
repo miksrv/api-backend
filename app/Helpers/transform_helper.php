@@ -131,3 +131,21 @@ function convert_wind_speed($wind_speed)
     else
         return 5;
 }
+
+/**
+ * Formats bytes in KB, MB, or GB
+ * @param $size
+ * @param string $param (kb \ mb \ gb)
+ * @param integer $precusion
+ * @return int
+ */
+function format_bytes( $size, $param = 'kb', $precusion = 2 )
+{
+    switch($param)  {
+        case 'gb': $size /= 1024;
+        case 'mb': $size /= 1024;
+        case 'kb': $size /= 1024;
+    }
+
+    return round($size, 2);
+}

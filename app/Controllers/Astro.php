@@ -11,46 +11,78 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
  */
 class Astro extends BaseController
 {
-    /**
-     * Designed for the parser of FIT files, the file headers are transferred in the request,
-     * which are saved to the database
-     * @return \CodeIgniter\HTTP\Response
-     */
-    function fit()
+    protected $_webcam_url = 'http://astro.myftp.org:8002/jpg/1/image.jpg';
+
+    function set($action)
     {
-        $request = \Config\Services::request();
-        $RAWData = $request->getJSON();
+        $FITData = new \FITLibrary();
 
-        if (!is_object($RAWData) || !isset($RAWData->OBJECT)) {
-            log_message('error', '[' . __METHOD__ . '] Empty RAW data (' . json_encode($RAWData) . ')');
+        switch ($action)
+        {
+            case 'fit_object':
+                $request = \Config\Services::request();
+                $RAWData = $request->getJSON();
 
-            return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
+                if (!is_object($RAWData) || !isset($RAWData->OBJECT))
+                {
+                    log_message('error', '[' . __METHOD__ . '] Empty RAW data (' . json_encode($RAWData) . ')');
+                    return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
+                }
+
+                $FITData->create_fit_array($RAWData);
+                $FITData->save_fit();
+
+                $this->response->setJSON(['status' => true])->send();
+
+                break;
+
+            default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-
-        $FITLibrary = new \FITLibrary();
-        $FITLibrary->create_fit_array($RAWData);
-        $FITLibrary->save_fit();
-
-        $this->response->setJSON(['status' => true])->send();
     }
 
     function get($action)
     {
         $Sensors = new \Sensors(['source' => 'astro']);
+        $FITData = new \FITLibrary();
 
         switch ($action)
         {
-            case 'summary'   : $summary = $Sensors->summary(); break;
-            case 'statistic' : $summary = $Sensors->statistic(); break;
+            // Summary data on sensors of the observatory
+            case 'summary' :
+                $this->response->setJSON( $Sensors->summary() )->send();
+                break;
+
+            // Statistics for graphing by sensors in the observatory
+            case 'statistic' :
+                $this->response->setJSON( $Sensors->statistic() )->send();
+                break;
+
+            // FIT file data
+            case 'fit_stats' :
+                $this->response->setJSON( $FITData->statistics() )->send();
+                break;
+
+            // FIT file data for object by name
+            case 'fit_object_stats' :
+                $request = \Config\Services::request();
+                $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
+
+                $this->response->setJSON( $FITData->statistics_object($objName) )->send();
+                break;
+
+            // FIT file data
+            case 'webcam' :
+                if ( ! $photo = cache('webcam_photo'))
+                {
+                    $photo = file_get_contents($this->_webcam_url);
+
+                    cache()->save('webcam_photo', $photo);
+                }
+
+                $this->response->setHeader('Content-Type', 'image/pjpeg')->setBody($photo)->send();
+                break;
 
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-
-        $this->response
-            ->setJSON([
-                'period'  => $summary->period,
-                'update'  => strtotime($summary->update),
-                'sensors' => $summary->data
-            ])->send();
     }
 }

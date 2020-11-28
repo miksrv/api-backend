@@ -130,7 +130,6 @@ class Get extends BaseController
      */
     protected function _insert_additional_data($raw_input)
     {
-
         $_tmp = json_decode($raw_input);
         $_tmp->dp = calculate_dew_point($_tmp->h, $_tmp->t2);
         $_tmp->wd = convert_anemometr_data((int) $_tmp->wd);

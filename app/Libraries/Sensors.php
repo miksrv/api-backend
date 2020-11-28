@@ -35,7 +35,7 @@ class Sensors {
 
         return (object) [
             'period' => $this->period,
-            'update' => $this->update,
+            'update' => strtotime($this->update),
             'data'   => $this->_data
         ];
     }
@@ -51,7 +51,7 @@ class Sensors {
 
         return (object) [
             'period' => $this->period,
-            'update' => $this->update,
+            'update' => strtotime($this->update),
             'data'   => $this->_data
         ];
     }
