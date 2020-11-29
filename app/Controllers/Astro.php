@@ -6,7 +6,6 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 
 /**
  * Class Astro
- * Working with astronomical images (FITS)
  * @package App\Controllers
  */
 class Astro extends BaseController
@@ -23,7 +22,7 @@ class Astro extends BaseController
                 $request = \Config\Services::request();
                 $RAWData = $request->getJSON();
 
-                if (!is_object($RAWData) || !isset($RAWData->OBJECT))
+                if ( ! is_object($RAWData) || ! isset($RAWData->OBJECT))
                 {
                     log_message('error', '[' . __METHOD__ . '] Empty RAW data (' . json_encode($RAWData) . ')');
                     return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
