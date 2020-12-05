@@ -75,7 +75,7 @@ class Astro extends BaseController
                 {
                     $photo = file_get_contents($this->_webcam_url);
 
-                    cache()->save('webcam_photo', $photo);
+                    cache()->save('webcam_photo', $photo, 30);
                 }
 
                 $this->response->setHeader('Content-Type', 'image/pjpeg')->setBody($photo)->send();

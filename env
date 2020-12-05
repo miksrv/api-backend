@@ -61,6 +61,12 @@ app.narodmon.lat = 31.0
 app.narodmon.lon = 32.0
 app.narodmon.alt = 80
 
+app.observatory.url = http://observatory.local/
+
+app.user_login = user
+app.user_passw = password
+app.user_session_time = 60
+
 #--------------------------------------------------------------------
 # DATABASE
 #--------------------------------------------------------------------
@@ -76,6 +82,11 @@ app.narodmon.alt = 80
 # database.tests.username = root
 # database.tests.password = root
 # database.tests.DBDriver = MySQLi
+
+database.table.users_data = users_data
+database.table.meteo_data = meteo_data
+database.table.astro_data = astro_sensors
+database.table.astro_fits = astro_fits
 
 #--------------------------------------------------------------------
 # CONTENT SECURITY POLICY
