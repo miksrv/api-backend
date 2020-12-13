@@ -1,8 +1,8 @@
 <?php namespace App\Controllers;
 
 header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
 
 /**
  * @package App\Controllers
@@ -13,14 +13,15 @@ class Auth extends BaseController
     function login()
     {
         $request = \Config\Services::request();
+        $RAWData = $request->getJSON();
 
-        $userLogin = $request->getPost('login', FILTER_SANITIZE_STRING);
-        $userPassw = $request->getPost('passw', FILTER_SANITIZE_STRING);
+        $userLogin = $RAWData->login;
+        $userPassw = $RAWData->passw;
 
         if (empty($userLogin) || empty($userPassw))
         {
             log_message('error', '[' . __METHOD__ . '] Empty auth data (' . $userLogin . ')');
-            $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
+            $this->response->setStatusCode(200)->setJSON(['status' => false])->send();
             exit();
         }
 
@@ -28,7 +29,7 @@ class Auth extends BaseController
             $userPassw != getenv('app.user_passw'))
         {
             log_message('error', '[' . __METHOD__ . '] Wrong login or password (' . $userLogin . ':' . $userPassw . ')');
-            $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
+            $this->response->setStatusCode(200)->setJSON(['status' => false])->send();
             exit();
         }
 
@@ -43,18 +44,18 @@ class Auth extends BaseController
 
     function logout()
     {
-        $request  = \Config\Services::request();
         $UserAuth = new \UserAuth();
 
-        $UserAuth->do_logout($request->getCookie('token'));
+        $UserAuth->do_logout($this->request->getHeaderLine('AuthToken'));
+
+        exit();
     }
 
     function check()
     {
-        $request  = \Config\Services::request();
         $UserAuth = new \UserAuth();
 
-        $token = $request->getCookie('token');
+        $token = $this->request->getHeaderLine('AuthToken');
 
         if (empty($token))
         {
@@ -69,5 +70,6 @@ class Auth extends BaseController
         }
 
         $this->response->setStatusCode(200)->setJSON(['status' => true])->send();
+        exit();
     }
 }
