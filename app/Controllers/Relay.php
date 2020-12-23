@@ -1,7 +1,8 @@
 <?php namespace App\Controllers;
 
 header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Methods: GET, OPTIONS");
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');git
 
 class Relay extends BaseController
 {
