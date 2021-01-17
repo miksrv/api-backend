@@ -25,6 +25,15 @@ class Relay extends BaseController
      */
     function set()
     {
+        $token = $this->request->getHeaderLine('AuthToken');
+
+        if (empty($token))
+        {
+            log_message('error', '[' .  __METHOD__ . '] Empty or wrong AuthToken');
+            $this->response->setStatusCode(200)->setJSON(['status' => false])->send();
+            exit();
+        }
+
         $device = (int) $this->request->getGet('device');
         $status = (int) $this->request->getGet('status');
 
