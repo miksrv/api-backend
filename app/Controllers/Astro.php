@@ -61,6 +61,11 @@ class Astro extends BaseController
                 $this->response->setJSON( $FITData->statistics() )->send();
                 break;
 
+            // FIT file data
+            case 'month_stats' :
+                $this->response->setJSON( $FITData->month_stat(1, 2021) )->send();
+                break;
+
             // FIT file data for object by name
             case 'fit_object_stats' :
                 $request = \Config\Services::request();

@@ -144,6 +144,62 @@ class FITLibrary
         ];
     }
 
+    function month_stat($month = null, $year = null)
+    {
+        if (empty($month) || empty($year))
+        {
+            $month = date('m');
+            $year  = date('Y');
+        }
+
+        $dataModel = model('App\Models\FITsData');
+        $dataFITs  = $dataModel->get_by_month($month, $year);
+
+        if (empty($dataFITs))
+        {
+            return (object)[
+                'status' => false,
+            ];
+        }
+
+        $_dataTmp = $result = [];
+
+        foreach ($dataFITs as $key => $row)
+        {
+            $_date = date('d', strtotime($row->item_date_obs));
+
+            if (! isset($_dataTmp[$_date]))
+            {
+                $_dataTmp[$_date] = [
+                    'frames'   => 1,
+                    'exposure' => $row->item_exptime
+                ];
+            }
+            else
+            {
+                $_dataTmp[$_date]['frames']   += 1;
+                $_dataTmp[$_date]['exposure'] += $row->item_exptime;
+            }
+        }
+
+        foreach ($_dataTmp as $day => $row)
+        {
+            $date     = $day . '.' . $month . '.' . $year;
+            $result[] = [
+                'id'    => $day,
+                'title' => 'Кадров: ' . $row['frames'] . ', ' . ($row['exposure'] / 60) . ' мин.',
+                'start' => $date,
+                'end'   => $date,
+                'type'  => 'astro'
+            ];
+        }
+        
+        return (object) [
+            'status'   => true,
+            'data'     => $result
+        ];
+    }
+
     function statistics_object($name) {
         $dataModel = model('App\Models\FITsData');
         $dataFITs  = $dataModel->get_by_name($name);
