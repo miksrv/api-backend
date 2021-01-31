@@ -63,7 +63,19 @@ class Astro extends BaseController
 
             // FIT file data
             case 'month_stats' :
-                $this->response->setJSON( $FITData->month_stat(1, 2021) )->send();
+                $month = date('m');
+                $year  = date('Y');
+                $date  = $this->request->getGet('date');
+                if ( ! empty($date))
+                {
+                    $date  = strtotime($date);
+                    if (checkdate(date('m', $date), date('d', $date), date('Y', $date)))
+                    {
+                        $month = date('m', $date);
+                        $year  = date('Y', $date);
+                    }
+                }
+                $this->response->setJSON( $FITData->month_stat($month, $year) )->send();
                 break;
 
             // FIT file data for object by name
