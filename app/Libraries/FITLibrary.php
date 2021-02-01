@@ -139,7 +139,7 @@ class FITLibrary
             'statistic' => $objects,
             'frames'    => $total_frame,
             'exposure'  => $total_exp,
-            'filesize'  => format_bytes(count($objects) * self::FIT_FILE_SIZE, 'gb'),
+            'filesize'  => format_bytes($total_frame * self::FIT_FILE_SIZE, 'gb'),
             'objects'   => count($objects)
         ];
     }
