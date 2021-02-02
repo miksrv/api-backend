@@ -11,6 +11,13 @@ class WeatherStat {
     protected $_period  = ['today', 'yesterday', 'week', 'month'];
     protected $_dataset = [];
 
+    public function month_event($month, $year)
+    {
+        $dataModel = model('App\Models\SensorData');
+
+        return $dataModel->get_month($month, $year);
+    }
+
     function get_statistic($param)
     {
         if ( ! isset($param['dataset']) || empty($param['dataset']) || ! is_array($param['dataset']))

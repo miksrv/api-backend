@@ -58,6 +58,91 @@ class Get extends BaseController
         exit();
     }
 
+    public function month_event() {
+        $month = date('m');
+        $year  = date('Y');
+        $date  = $this->request->getGet('date');
+        if ( ! empty($date))
+        {
+            $date  = strtotime($date);
+            if (checkdate(date('d', $date), date('m', $date), date('Y', $date)))
+            {
+                $month = date('m', $date);
+                $year  = date('Y', $date);
+            }
+        }
+
+        $_cache_name = 'month_event_' . $month . '.' . $year;
+
+        if ( ! $result = cache($_cache_name))
+        {
+            $WeatherStat = new \WeatherStat();
+            $statistic   = $WeatherStat->month_event($month, $year);
+
+            if (empty($statistic))
+            {
+                $this->response->setJSON(['status'  => false])->send();
+                exit();
+            }
+
+            $_dataTmp = $result = [];
+
+            foreach ($statistic as $key => $row)
+            {
+                $_date = date('d', strtotime($row->item_timestamp));
+                $_tmp  = json_decode($row->item_raw_data);
+
+                if (! isset($_dataTmp[$_date]))
+                {
+                    $_dataTmp[$_date] = [
+                        't' => $_tmp->t2,
+                        'h' => $_tmp->h,
+                        'p' => $_tmp->p,
+                        'w' => $_tmp->ws,
+                        'count' => 1
+                    ];
+                }
+                else
+                {
+                    $_dataTmp[$_date]['t'] += $_tmp->t2;
+                    $_dataTmp[$_date]['h'] += $_tmp->h;
+                    $_dataTmp[$_date]['p'] += $_tmp->p;
+                    $_dataTmp[$_date]['w'] += $_tmp->ws;
+                    $_dataTmp[$_date]['count'] += 1;
+                }
+            }
+
+            foreach ($_dataTmp as $day => $row)
+            {
+                $_t = round($row['t'] / $row['count'], 1);
+                $_h = round($row['h'] / $row['count'], 1);
+                $_p = round($row['p'] / $row['count'], 0);
+                $_w = round($row['w'] / $row['count'], 1);
+
+                $date     = $day . '.' . $month . '.' . $year;
+                $result[] = [
+                    'id'    => 100 + $day,
+                    'title' => 'Т: ' . $_t . ', H: ' . $_h . ', P: ' . $_p . ', W: ' . $_w,
+                    'start' => $date,
+                    'end'   => $date,
+                    'type'  => 'meteo'
+                ];
+            }
+
+            $result = json_encode($result);
+
+            cache()->save($_cache_name, $result, 600);
+        }
+
+        $this->response
+            ->setJSON([
+                'status' => true,
+                'data'   => json_decode($result)
+            ])->send();
+
+        exit();
+    }
+
     /**
      * Weather forecast from OpenWeatherMap service
      */

@@ -37,4 +37,15 @@ class SensorData extends Model
                     ->get()
                     ->getResult();
     }
+
+    public function get_month($month, $year)
+    {
+        $this->table = getenv('database.table.meteo_data');
+
+        return $this->db
+            ->table($this->table)
+            ->orderBy('item_timestamp', 'DESC')
+            ->getWhere(['YEAR(item_timestamp)' => $year, 'MONTH(item_timestamp)' => $month])
+            ->getResult();
+    }
 }
