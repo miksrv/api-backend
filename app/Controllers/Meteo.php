@@ -24,6 +24,18 @@ class Meteo extends BaseController
     {
         switch ($action)
         {
+            case 'events' :
+                break;
+
+            case 'forecast' :
+                break;
+
+            case 'summary' :
+                break;
+
+            case 'statistic' :
+                break;
+
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
     }

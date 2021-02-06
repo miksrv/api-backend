@@ -32,10 +32,10 @@ class SensorData extends Model
         }
 
         return $this->db->table($this->table)
-                    ->where('`item_timestamp` >= ' . $period)
-                    ->orderBy('item_timestamp', 'DESC')
-                    ->get()
-                    ->getResult();
+            ->where('`item_timestamp` >= ' . $period)
+            ->orderBy('item_timestamp', 'DESC')
+            ->get()
+            ->getResult();
     }
 
     public function get_month($month, $year)
