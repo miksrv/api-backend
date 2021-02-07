@@ -1,5 +1,7 @@
 <?php namespace App\Controllers;
 
+use FITLibrary;
+
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 
@@ -14,7 +16,7 @@ class Astro extends BaseController
 
     function set($action)
     {
-        $FITData = new \FITLibrary();
+        $FITData = new FITLibrary();
 
         switch ($action)
         {
@@ -42,7 +44,7 @@ class Astro extends BaseController
     function get($action)
     {
         $Sensors = new \Sensors(['source' => 'astro']);
-        $FITData = new \FITLibrary();
+        $FITData = new FITLibrary();
 
         switch ($action)
         {
@@ -68,7 +70,7 @@ class Astro extends BaseController
                 $date  = $this->request->getGet('date');
                 if ( ! empty($date))
                 {
-                    $date  = strtotime($date);
+                    $date = strtotime($date);
                     if (checkdate(date('d', $date), date('m', $date), date('Y', $date)))
                     {
                         $month = date('m', $date);

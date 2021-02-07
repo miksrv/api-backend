@@ -5,7 +5,7 @@
  * @param $index
  * @return int
  */
-function convert_anemometr_data($index)
+function convert_anemometr_data($index): int
 {
     $_wind_dir = [
         1  => 0,
@@ -34,7 +34,7 @@ function convert_anemometr_data($index)
  * @param $data_bit
  * @return int
  */
-function convert_degree_to_direct($degree)
+function convert_degree_to_direct($degree): int
 {
     if ($degree == 0) return 0;
 
@@ -60,7 +60,7 @@ function convert_degree_to_direct($degree)
 
 /**
  * Convert wind direction degree to russian name
- * @param $data_bit
+ * @param $degree
  * @return int
  */
 function convert_degree_to_name($degree)
@@ -92,7 +92,7 @@ function convert_degree_to_name($degree)
  * @param $key
  * @return int
  */
-function convert_index_to_deegre($key)
+function convert_index_to_deegre($key): int
 {
     if ($key == 0) return 0;
 
@@ -114,7 +114,7 @@ function convert_index_to_deegre($key)
  * @param $wind_speed
  * @return int
  */
-function convert_wind_speed($wind_speed)
+function convert_wind_speed($wind_speed): int
 {
     $wind_speed = (int) $wind_speed;
 
@@ -139,7 +139,7 @@ function convert_wind_speed($wind_speed)
  * @param integer $precusion
  * @return int
  */
-function format_bytes( $size, $param = 'kb', $precusion = 2 )
+function format_bytes( $size, $param = 'kb', $precusion = 2 ): int
 {
     switch($param)  {
         case 'gb': $size /= 1024;
@@ -148,4 +148,21 @@ function format_bytes( $size, $param = 'kb', $precusion = 2 )
     }
 
     return round($size, 2);
+}
+
+function create_wind_rose_array(): array
+{
+    $_array = [];
+
+    // Wind speed
+    for ($i = 0; $i <= 6; $i++)
+    {
+        // Wind direction
+        for ($k = 0; $k <= 7; $k++)
+        {
+            $_array[$i][$k] = 0;
+        }
+    }
+
+    return $_array;
 }
