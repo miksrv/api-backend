@@ -10,6 +10,8 @@ class Sensors {
     protected $dataset = [];
     protected $update;
     protected $period;
+    protected $date;
+    protected $range;
     protected $dewpoint;
 
     /**
@@ -23,14 +25,69 @@ class Sensors {
     {
         helper(['transform', 'calculate']);
 
-        $this->_dataModel = $dataModel = model('App\Models\SensorData');
+        $this->_dataModel = model('App\Models\SensorData');
         $this->_source    = isset($param['source']) ? $param['source'] : 'meteo';
 
         $this->dataset  = (isset($param['dataset']) && is_array($param['dataset'])) ? $param['dataset'] : [];
-        $this->period   = ( ! isset($param['period']) || ! in_array($param['period'], $this->_periods)) ? $this->_periods[0] : $param['period'];
+        $this->period   = (! isset($param['period']) || ! in_array($param['period'], $this->_periods)) ? $this->_periods[0] : $param['period'];
         $this->dewpoint = (isset($param['dewpoint']['t']) && isset($param['dewpoint']['h'])) ? $param['dewpoint'] : null;
 
-        $this->_data = $this->_dataModel->get_period($this->_source, $this->period);
+        // NEW period
+        $this->date  = (isset($param['date']) ? $param['date'] : null);
+        $this->range = isset($param['daterange']) ? $param['daterange'] : null;
+
+        $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
+    }
+
+    function archive(): object
+    {
+        if (empty($this->_data)) return (object) [];
+
+        $_dataTmp = $result = [];
+
+        foreach ($this->_data as $row)
+        {
+            $_date   = date('d.m.Y', strtotime($row->item_timestamp));
+            $_sensor = json_decode($row->item_raw_data);
+
+            if (! isset($_dataTmp[$_date]['count'])) {
+                $_dataTmp[$_date]['count'] = 1;
+            } else {
+                $_dataTmp[$_date]['count'] += 1;
+            }
+
+            foreach ($_sensor as $key => $val)
+            {
+                if (! isset($_dataTmp[$_date][$key]))
+                {
+                    $_dataTmp[$_date][$key] = $val;
+                }
+                else
+                {
+                    $_dataTmp[$_date][$key] += $val;
+                }
+            }
+        }
+
+        foreach ($_dataTmp as $key => $sensors)
+        {
+            foreach ($sensors as $id => $val)
+            {
+                if ($key == 'count') continue;
+
+                $result[$key][$id] = round($val / $_dataTmp[$key]['count'], 1);
+            }
+
+            unset($result[$key]['count']);
+        }
+
+        unset($_dataTmp);
+
+        return (object) [
+            'date_start' => (isset($this->range->start) ? $this->range->start : null),
+            'date_end'   => (isset($this->range->end) ? $this->range->end : null),
+            'data'       => $result
+        ];
     }
 
     /**
@@ -47,6 +104,9 @@ class Sensors {
         return (object) [
             'period' => $this->period,
             'update' => strtotime($this->update),
+            'date_start' => (isset($this->range->start) ? $this->range->start : null),
+            'date_end'   => (isset($this->range->end) ? $this->range->end : null),
+            'date'   => $this->date,
             'data'   => $this->_data
         ];
     }
@@ -60,6 +120,7 @@ class Sensors {
         return (object) [
             'period' => $this->period,
             'update' => strtotime($this->update),
+            'date'   => $this->date,
             'data'   => $this->_data
         ];
     }

@@ -71,7 +71,7 @@ class Astro extends BaseController
                 if ( ! empty($date))
                 {
                     $date = strtotime($date);
-                    if (checkdate(date('d', $date), date('m', $date), date('Y', $date)))
+                    if (checkdate(date('m', $date), date('d', $date), date('Y', $date)))
                     {
                         $month = date('m', $date);
                         $year  = date('Y', $date);

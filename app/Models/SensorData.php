@@ -4,10 +4,11 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
+ini_set('memory_limit', '128M');
+
 class SensorData extends Model
 {
     protected $table = '';
-
     protected $db;
 
     public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
@@ -20,10 +21,35 @@ class SensorData extends Model
      * #TODO Optimize
      * @return mixed
      */
-    public function get_period($source = 'meteo', $period = 'today')
+    public function get_period($source = 'meteo', $period = 'today', $date = null, $daterange = null)
     {
         $this->table = getenv('database.table.' . $source . '_data');
 
+        /**
+         * date - выбирается дата за день, от начала дня до его конца, или до последней записи (если текущией день)
+         * date_start - начало периода, день с начала 00:00
+         * date_end - концев периода, окончание дня до 23:59:59
+         */
+
+        if ($date) {
+            return $this->db->table($this->table)
+                ->where("DATE_FORMAT(item_timestamp, '%Y-%m-%d') = '{$date}'")
+                ->orderBy('item_timestamp', 'DESC')
+                ->get()
+                ->getResult();
+        }
+
+        // Feature
+        if ($daterange) {
+            return $this->db->table($this->table)
+                ->where("DATE_FORMAT(item_timestamp, '%Y-%m-%d') BETWEEN '{$daterange->start}' AND '{$daterange->end}'")
+                ->orderBy('item_timestamp', 'DESC')
+                ->get()
+                ->getResult();
+
+        }
+
+        // Deprecated
         switch ($period) {
             case 'today'     : $period = 'DATE_SUB(NOW(), INTERVAL 1 DAY)'; break;
             case 'yesterday' : $period = 'CURDATE() - INTERVAL 1 DAY'; break;
