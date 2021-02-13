@@ -12,6 +12,8 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
  */
 class Meteo extends BaseController
 {
+    const CACHE_TIME = 60 * 60 * 12; // 12h
+
     function set($action)
     {
         switch ($action)
@@ -22,10 +24,13 @@ class Meteo extends BaseController
 
     function get($action)
     {
+        $period  = $this->_get_period();
         $Sensors = new Sensors([
-            'source'   => 'meteo',
-            'dataset'  => ['t2','h','p','dp','uv','lux','ws','wd'],
-            'dewpoint' => ['t' => 't2', 'h' => 'h']
+            'source'    => 'meteo',
+            'date'      => $this->_get_date('date'),
+            'daterange' => $period,
+            'dataset'   => ['t2','h','p','dp','uv','lux','ws','wd'],
+            'dewpoint'  => ['t' => 't2', 'h' => 'h']
         ]);
 
         switch ($action)
@@ -43,7 +48,48 @@ class Meteo extends BaseController
                 $this->response->setJSON( $OpenWeather->get_forecast() )->send();
                 break;
 
+            case 'archive' :
+                $_cache_name = "archive_{$period->start}_{$period->end}";
+
+                if ( ! $_archive_data = json_decode(cache($_cache_name))) {
+                    $_archive_data = $Sensors->archive();
+                    cache()->save($_cache_name, json_encode($_archive_data), self::CACHE_TIME);
+                }
+
+                $this->response->setJSON( $_archive_data )->send();
+                break;
+
+            case 'kindex' :
+                $NooaData = new \NooaData();
+                $this->response->setJSON( $NooaData->get_kindex() )->send();
+                break;
+
             default : throw PageNotFoundException::forPageNotFound();
         }
+    }
+
+    protected function _get_date($param_name) {
+        $date = $this->request->getGet($param_name);
+
+        if ( ! $date) return null;
+
+        $date = strtotime($date);
+
+        if ( ! checkdate(date('m', $date), date('d', $date), date('Y', $date)))
+            return null;
+
+        return date('Y-m-d', $date);
+    }
+
+    protected function _get_period() {
+        $date_start = $this->_get_date('date_start');
+        $date_end   = $this->_get_date('date_end');
+
+        if ( ! $date_start || ! $date_end) return null;
+
+        return (object) [
+            'start' => $date_start,
+            'end'   => $date_end
+        ];
     }
 }

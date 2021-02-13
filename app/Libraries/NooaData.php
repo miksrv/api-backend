@@ -17,26 +17,30 @@ class NooaData {
     public function get_kindex()
     {
 
-        if ( ! $kindex = cache('kindex'))
-        {
+//        if ( ! $kindex = cache('kindex'))
+//        {
             $client   = \Config\Services::curlrequest();
-            $response = $client->get(self::API_URL);
+            $request = $client->get(self::API_URL);
 
-            if ($response->getStatusCode() !== 200)
+            if ($request->getStatusCode() !== 200)
             {
-                log_message('error', '[' .  __METHOD__ . '] Data error: ' . $response->data);
+                log_message('error', '[' .  __METHOD__ . '] Data error: ' . $request->data);
 
                 return (object) [
                     'status' => false,
-                    'code'   => $response->getStatusCode(),
-                    'data'   => $response->getBody()
+                    'code'   => $request->getStatusCode(),
+                    'data'   => $request->getBody()
                 ];
             }
 
-            $kindex = $response->getBody();
+            $kindex = $request->getBody();
 
-            cache()->save('kindex', $kindex, self::CACHE_TIME);
-        }
+            echo '<pre>';
+            var_dump($request);
+            exit();
+
+//            cache()->save('kindex', $kindex, self::CACHE_TIME);
+//        }
 
         return (object) [
             'status' => true,
