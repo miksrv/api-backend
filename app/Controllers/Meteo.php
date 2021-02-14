@@ -85,7 +85,10 @@ class Meteo extends BaseController
         $date_start = $this->_get_date('date_start');
         $date_end   = $this->_get_date('date_end');
 
-        if ( ! $date_start || ! $date_end) return null;
+        if ( ! $date_start || ! $date_end) return (object) [
+            'start' => date('Y-m-01'),
+            'end'   => date('Y-m-d'),
+        ];
 
         return (object) [
             'start' => $date_start,
