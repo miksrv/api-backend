@@ -144,7 +144,7 @@ class FITLibrary
         ];
     }
 
-    function month_stat($month = null, $year = null)
+    function archive($month = null, $year = null)
     {
         if (empty($month) || empty($year))
         {
@@ -185,12 +185,9 @@ class FITLibrary
         foreach ($_dataTmp as $day => $row)
         {
             $date     = $day . '.' . $month . '.' . $year;
-            $result[] = [
-                'id'    => $day,
-                'title' => 'Кадров: ' . $row['frames'] . ', ' . ($row['exposure'] / 60) . ' мин.',
-                'start' => $date,
-                'end'   => $date,
-                'type'  => 'astro'
+            $result[$date] = [
+                'frames'   => (int) $row['frames'],
+                'exposure' => (int) ($row['exposure'] / 60)
             ];
         }
         

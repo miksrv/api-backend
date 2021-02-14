@@ -64,7 +64,7 @@ class Astro extends BaseController
                 break;
 
             // FIT file data
-            case 'month_stats' :
+            case 'archive' :
                 $month = date('m');
                 $year  = date('Y');
                 $date  = $this->request->getGet('date');
@@ -77,7 +77,7 @@ class Astro extends BaseController
                         $year  = date('Y', $date);
                     }
                 }
-                $this->response->setJSON( $FITData->month_stat($month, $year) )->send();
+                $this->response->setJSON( $FITData->archive($month, $year) )->send();
                 break;
 
             // FIT file data for object by name
