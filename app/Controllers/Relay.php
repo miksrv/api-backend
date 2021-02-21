@@ -25,7 +25,7 @@ class Relay extends BaseController
      */
     function set()
     {
-        $token = $this->request->getHeaderLine('AuthToken');
+        $token = $this->request->getHeaderLine('authtoken');
 
         if (empty($token))
         {

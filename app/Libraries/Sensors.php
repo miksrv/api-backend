@@ -29,18 +29,33 @@ class Sensors {
         $this->_source    = isset($param['source']) ? $param['source'] : 'meteo';
 
         $this->dataset  = (isset($param['dataset']) && is_array($param['dataset'])) ? $param['dataset'] : [];
-        $this->period   = (! isset($param['period']) || ! in_array($param['period'], $this->_periods)) ? $this->_periods[0] : $param['period'];
+        $this->period   = (isset($param['period']) && in_array($param['period'], $this->_periods)) ? $param['period'] : $this->_periods[0];
         $this->dewpoint = (isset($param['dewpoint']['t']) && isset($param['dewpoint']['h'])) ? $param['dewpoint'] : null;
 
         // NEW period
         $this->date  = (isset($param['date']) ? $param['date'] : null);
-        $this->range = isset($param['daterange']) ? $param['daterange'] : null;
+        $this->range = (isset($param['daterange']) ? $param['daterange'] : null);
+    }
 
+    private function _fetchData()
+    {
         $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
+    }
+
+    function set_range($start, $end)
+    {
+        $this->range = (object) ['start' => $start, 'end' => $end];
+    }
+
+    function set_date($date)
+    {
+        $this->date = $date;
     }
 
     function archive(): object
     {
+        $this->_fetchData();
+
         if (empty($this->_data)) return (object) [];
 
         $_dataTmp = $result = [];
@@ -97,15 +112,15 @@ class Sensors {
      */
     function summary(): ?object
     {
+        $this->_fetchData();
+
         if (empty($this->_data)) return (object) [];
  
-        $this->_fetch_data();
+        $this->_make_summary_data();
 
         return (object) [
             'period' => $this->period,
             'update' => strtotime($this->update),
-            'date_start' => (isset($this->range->start) ? $this->range->start : null),
-            'date_end'   => (isset($this->range->end) ? $this->range->end : null),
             'date'   => $this->date,
             'data'   => $this->_data
         ];
@@ -113,6 +128,8 @@ class Sensors {
 
     function statistic(): ?object
     {
+        $this->_fetchData();
+
         if (empty($this->_data)) return (object) [];
 
         $this->_make_graph_data($this->period);
@@ -125,7 +142,7 @@ class Sensors {
         ];
     }
 
-    protected function _fetch_data()
+    protected function _make_summary_data()
     {
         if (empty($this->_data)) return ;
 

@@ -24,11 +24,11 @@ class Meteo extends BaseController
 
     function get($action)
     {
-        $period  = $this->_get_period();
+//        $period  = $this->_get_period();
         $Sensors = new Sensors([
             'source'    => 'meteo',
-            'date'      => $this->_get_date('date'),
-            'daterange' => $period,
+//            'date'      => $this->_get_date('date'),
+//            'daterange' => $period,
             'dataset'   => ['t2','h','p','dp','uv','lux','ws','wd'],
             'dewpoint'  => ['t' => 't2', 'h' => 'h']
         ]);
@@ -36,10 +36,12 @@ class Meteo extends BaseController
         switch ($action)
         {
             case 'summary' :
+                $Sensors->set_date($this->_get_date('date'));
                 $this->response->setJSON( $Sensors->summary() )->send();
                 break;
 
             case 'statistic' :
+                $Sensors->set_date($this->_get_date('date'));
                 $this->response->setJSON( $Sensors->statistic() )->send();
                 break;
 
@@ -49,7 +51,10 @@ class Meteo extends BaseController
                 break;
 
             case 'archive' :
+                $period      = $this->_get_period();
                 $_cache_name = "archive_{$period->start}_{$period->end}";
+
+                $Sensors->set_range($period->start, $period->end);
 
                 if ( ! $_archive_data = json_decode(cache($_cache_name))) {
                     $_archive_data = $Sensors->archive();

@@ -4,8 +4,6 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
-ini_set('memory_limit', '128M');
-
 class SensorData extends Model
 {
     protected $table = '';

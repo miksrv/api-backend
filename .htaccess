@@ -1,5 +1,13 @@
 # Disable directory browsing
 #Options All -Indexes
+<IfModule mod_php5.c>
+    php_value memory_limit 256M
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_value memory_limit 256M
+</IfModule>
+
 
 # ----------------------------------------------------------------------
 # Rewrite engine
