@@ -58,7 +58,7 @@ class Relay extends BaseController
      * @param $method class method
      * @return \CodeIgniter\HTTP\Response
      */
-    protected function _response($data, $code = 400, $method)
+    protected function _response(string $data, $code = 400, $method): \CodeIgniter\HTTP\Response
     {
         if ($code !== 200)
         {

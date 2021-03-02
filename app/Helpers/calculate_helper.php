@@ -17,7 +17,8 @@ function calculate_dew_point($humidity, $temp)
  * @param $_temp_wr_total
  * @return array|null
  */
-function calculate_wind_rose($_temp_wr, $_temp_wr_total) {
+function calculate_wind_rose($_temp_wr, $_temp_wr_total): ?array
+{
     if ($_temp_wr_total == 0) return null;
 
     $new_wr_array = [];

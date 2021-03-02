@@ -14,7 +14,7 @@ class OpenWeather {
     /**
      * Weather forecast from OpenWeatherMap service
      */
-    public function get_forecast()
+    public function get_forecast(): object
     {
         if ( ! $foreacst = cache('forecast'))
         {

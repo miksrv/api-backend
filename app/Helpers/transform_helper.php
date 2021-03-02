@@ -31,7 +31,7 @@ function convert_anemometr_data($index): int
 
 /**
  * Convert wind direction degree to index value
- * @param $data_bit
+ * @param $degree
  * @return int
  */
 function convert_degree_to_direct($degree): int
@@ -147,7 +147,7 @@ function format_bytes( $size, $param = 'kb', $precusion = 2 ): int
         case 'kb': $size /= 1024;
     }
 
-    return round($size, 2);
+    return round($size, $precusion);
 }
 
 function create_wind_rose_array(): array

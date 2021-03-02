@@ -14,7 +14,7 @@ class UserAuth {
      * @param $login
      * @return string
      */
-    function do_login($login)
+    function do_login($login): string
     {
         $request = \Config\Services::request();
         $token   = $this->create_token($login);
@@ -40,7 +40,7 @@ class UserAuth {
      * @param $token
      * @return bool
      */
-    function do_check_token($token)
+    function do_check_token($token): bool
     {
         $request   = \Config\Services::request();
         $tokenData = $this->_dataModel->get_by_token($token);
@@ -66,7 +66,7 @@ class UserAuth {
      * @param $user_login
      * @return string
      */
-    function create_token($user_login)
+    function create_token($user_login): string
     {
         $request = \Config\Services::request();
 
