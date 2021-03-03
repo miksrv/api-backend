@@ -17,17 +17,18 @@ function calculate_dew_point($humidity, $temp)
  * @param $_temp_wr_total
  * @return array|null
  */
-function calculate_wind_rose($_temp_wr, $_temp_wr_total): ?array
+function calculate_wind_rose($_temp_wr, $_temp_wr_total)
 {
-    if ($_temp_wr_total == 0) return null;
+    //if ($_temp_wr_total == 0) return null;
 
     $new_wr_array = [];
 
     foreach ($_temp_wr as $key_wr_1 => $val_wr_direct) {
         foreach ($val_wr_direct as $key_wr_2 => $val_wr_speed) {
+            $_tmp = $_temp_wr_total > 0 ? round((($val_wr_speed / $_temp_wr_total) * 100), 1) : 0;
             $new_wr_array[$key_wr_1][] = [
                 convert_index_to_deegre($key_wr_2),
-                round((($val_wr_speed / $_temp_wr_total) * 100), 1)
+                $_tmp
             ];
         }
     }

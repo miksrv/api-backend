@@ -150,7 +150,7 @@ function format_bytes( $size, $param = 'kb', $precusion = 2 ): int
     return round($size, $precusion);
 }
 
-function create_wind_rose_array(): array
+function create_wind_rose_array()
 {
     $_array = [];
 
