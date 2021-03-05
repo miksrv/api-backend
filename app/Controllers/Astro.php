@@ -41,6 +41,11 @@ class Astro extends BaseController
         }
     }
 
+    public function delete($action)
+    {
+
+    }
+
     function get($action)
     {
         $Sensors = new \Sensors(['source' => 'astro']);
