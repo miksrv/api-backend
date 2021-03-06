@@ -29,6 +29,11 @@ class FITsData extends Model
         return $this->db->table($this->table)->get()->getResult();
     }
 
+    function delete_by_id($id)
+    {
+        return $this->db->table($this->table)->delete(['file_id' => $id]);
+    }
+
     function get_by_name($name)
     {
         return $this->db

@@ -43,7 +43,28 @@ class Astro extends BaseController
 
     public function delete($action)
     {
+        $token = $this->request->getHeaderLine('authtoken');
 
+        if (empty($token))
+        {
+            log_message('error', '[' .  __METHOD__ . '] Empty or wrong AuthToken');
+            $this->response->setStatusCode(200)->setJSON(['status' => false])->send();
+            exit();
+        }
+
+        $FITData = new FITLibrary();
+
+        switch ($action) {
+            case 'fit' :
+                $fileID = $this->request->getGet('id');
+                $result = $FITData->delete();
+
+                if ($result)
+                    log_message('info', '[' .  __METHOD__ . '] FIT file (' . $fileID . ') deleted');
+
+                $this->response->setStatusCode(200)->setJSON(['status' => $result])->send();
+                break;
+        }
     }
 
     function get($action)

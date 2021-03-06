@@ -57,6 +57,21 @@ class FITLibrary
     }
 
     /**
+     * Delete file by ID
+     * @param $fileID
+     * @return bool
+     */
+    public function delete($fileID): bool
+    {
+        if (empty($fileID)) return false;
+
+        $dataModel = model('App\Models\FITsData');
+        $dataModel->delete_by_id($fileID);
+
+        return true;
+    }
+
+    /**
      * Save FIT header in database
      * @param array $data
      * @return bool
