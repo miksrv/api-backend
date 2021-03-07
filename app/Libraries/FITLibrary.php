@@ -3,11 +3,17 @@
 class FITLibrary
 {
     protected $fit_header = [];
+    protected $_dataModel;
 
     // FIT file size in byte for 16 bit mask
     const FIT_FILE_SIZE = 32785920;
 
-    function create_fit_array($data)
+    function __construct()
+    {
+        $this->_dataModel = model('App\Models\FITsData');
+    }
+
+    function create_fit_array($data): array
     {
         return $this->fit_header = [
             'file_id'        => md5($data->FILE_NAME),
@@ -65,8 +71,7 @@ class FITLibrary
     {
         if (empty($fileID)) return false;
 
-        $dataModel = model('App\Models\FITsData');
-        $dataModel->delete_by_id($fileID);
+        $this->_dataModel->delete_by_id($fileID);
 
         return true;
     }
@@ -76,14 +81,13 @@ class FITLibrary
      * @param array $data
      * @return bool
      */
-    function save_fit($data = [])
+    function save_fit($data = []): bool
     {
         $data = (empty($data) ? $this->fit_header : $data);
 
         if (empty($data)) return false;
 
-        $dataModel = model('App\Models\FITsData');
-        $dataModel->add_fit($data);
+        $this->_dataModel->add_fit($data);
 
         return true;
     }
@@ -93,12 +97,11 @@ class FITLibrary
      * Creates a summary array of objects and general statistics for frames, exposure
      * @return object
      */
-    public function statistics()
+    public function statistics(): object
     {
         helper(['transform']);
 
-        $dataModel = model('App\Models\FITsData');
-        $dataFITs  = $dataModel->get_all();
+        $dataFITs = $this->_dataModel->get_all();
 
         $total_frame = $total_exp = 0;
 
@@ -159,7 +162,7 @@ class FITLibrary
         ];
     }
 
-    function archive($month = null, $year = null)
+    function archive($month = null, $year = null): object
     {
         if (empty($month) || empty($year))
         {
@@ -167,8 +170,7 @@ class FITLibrary
             $year  = date('Y');
         }
 
-        $dataModel = model('App\Models\FITsData');
-        $dataFITs  = $dataModel->get_by_month($month, $year);
+        $dataFITs = $this->_dataModel->get_by_month($month, $year);
 
         if (empty($dataFITs))
         {
@@ -212,7 +214,8 @@ class FITLibrary
         ];
     }
 
-    function statistics_object($name) {
+    function statistics_object($name): object
+    {
         $dataModel = model('App\Models\FITsData');
         $dataFITs  = $dataModel->get_by_name($name);
         $total_exp = 0;
@@ -223,7 +226,7 @@ class FITLibrary
         }
 
         return (object) [
-            'result'   => count($dataFITs) > 0 ? true : false,
+            'result'   => count($dataFITs) > 0,
             'data'     => $dataFITs,
             'exposure' => $total_exp,
             'filesize' => format_bytes(count($dataFITs) * self::FIT_FILE_SIZE, 'gb'),
