@@ -69,6 +69,7 @@ class Astro extends BaseController
 
     function get($action)
     {
+        $request = \Config\Services::request();
         $Sensors = new \Sensors(['source' => 'astro']);
         $FITData = new FITLibrary();
 
@@ -108,10 +109,16 @@ class Astro extends BaseController
 
             // FIT file data for object by name
             case 'fit_object_stats' :
-                $request = \Config\Services::request();
                 $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
 
                 $this->response->setJSON( $FITData->statistics_object($objName) )->send();
+                break;
+
+            // FIT file data for object by name
+            case 'day_object_stats' :
+                $objDate = $request->getVar('date', FILTER_SANITIZE_STRING);
+
+                $this->response->setJSON( $FITData->statistics_day($objDate) )->send();
                 break;
 
             // FIT file data

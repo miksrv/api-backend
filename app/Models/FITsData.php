@@ -43,7 +43,17 @@ class FITsData extends Model
                 ->getResult();
     }
 
-    function get_by_month($month, $year) {
+    function get_by_date($date)
+    {
+        return $this->db
+            ->table($this->table)
+            ->orderBy('item_date_obs', 'DESC')
+            ->getWhere("DATE_FORMAT(item_date_obs, '%Y-%m-%d') = '{$date}'")
+            ->getResult();
+    }
+
+    function get_by_month($month, $year)
+    {
         return $this->db
             ->table($this->table)
             ->orderBy('item_date_obs', 'DESC')

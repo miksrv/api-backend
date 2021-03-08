@@ -233,4 +233,24 @@ class FITLibrary
             'frames'   => count($dataFITs)
         ];
     }
+
+    function statistics_day($date): object
+    {
+        $dataModel = model('App\Models\FITsData');
+        $dataFITs  = $dataModel->get_by_date($date);
+        $total_exp = 0;
+
+        foreach ($dataFITs as $row)
+        {
+            $total_exp += $row->item_exptime;
+        }
+
+        return (object) [
+            'result'   => count($dataFITs) > 0,
+            'data'     => $dataFITs,
+            'exposure' => $total_exp,
+            'filesize' => format_bytes(count($dataFITs) * self::FIT_FILE_SIZE, 'gb'),
+            'frames'   => count($dataFITs)
+        ];
+    }
 }
