@@ -12,8 +12,6 @@ header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
  */
 class Astro extends BaseController
 {
-    protected $_webcam_url = 'http://astro.myftp.org:8002/jpg/1/image.jpg';
-
     function set($action)
     {
         $FITData = new FITLibrary();
@@ -125,7 +123,7 @@ class Astro extends BaseController
             case 'webcam' :
                 if ( ! $photo = cache('webcam_photo'))
                 {
-                    $photo = file_get_contents($this->_webcam_url);
+                    $photo = file_get_contents(getenv('app.observatory.webcam'));
 
                     cache()->save('webcam_photo', $photo, 30);
                 }
