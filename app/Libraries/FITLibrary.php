@@ -214,43 +214,46 @@ class FITLibrary
         ];
     }
 
+    /**
+     * Return statistic by object name
+     * @param $name
+     * @return object
+     */
     function statistics_object($name): object
     {
-        $dataModel = model('App\Models\FITsData');
-        $dataFITs  = $dataModel->get_by_name($name);
-        $total_exp = 0;
-
-        foreach ($dataFITs as $row)
-        {
-            $total_exp += $row->item_exptime;
-        }
-
-        return (object) [
-            'result'   => count($dataFITs) > 0,
-            'data'     => $dataFITs,
-            'exposure' => $total_exp,
-            'filesize' => format_bytes(count($dataFITs) * self::FIT_FILE_SIZE, 'gb'),
-            'frames'   => count($dataFITs)
-        ];
+        return $this->_get_statistic($this->_dataModel->get_by_name($name));
     }
 
+    /**
+     * Return statistic by shooting date
+     * @param $date format (Y-m-d)
+     * @return object
+     */
     function statistics_day($date): object
     {
-        $dataModel = model('App\Models\FITsData');
-        $dataFITs  = $dataModel->get_by_date($date);
+        return $this->_get_statistic($this->_dataModel->get_by_date($date));
+    }
+
+    /**
+     * Create objects statistic by FIT object
+     * @param $data
+     * @return object
+     */
+    protected function _get_statistic($data): object
+    {
         $total_exp = 0;
 
-        foreach ($dataFITs as $row)
+        foreach ($data as $row)
         {
             $total_exp += $row->item_exptime;
         }
 
         return (object) [
-            'result'   => count($dataFITs) > 0,
-            'data'     => $dataFITs,
+            'result'   => count($data) > 0,
+            'data'     => $data,
             'exposure' => $total_exp,
-            'filesize' => format_bytes(count($dataFITs) * self::FIT_FILE_SIZE, 'gb'),
-            'frames'   => count($dataFITs)
+            'filesize' => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
+            'frames'   => count($data)
         ];
     }
 }

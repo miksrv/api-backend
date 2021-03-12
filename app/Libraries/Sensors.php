@@ -37,11 +37,6 @@ class Sensors {
         $this->range = (isset($param['daterange']) ? $param['daterange'] : null);
     }
 
-    private function _fetchData()
-    {
-        $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
-    }
-
     function set_range($start, $end)
     {
         $this->range = (object) ['start' => $start, 'end' => $end];
@@ -330,5 +325,10 @@ class Sensors {
         $_result['wr'] = calculate_wind_rose($_temp_wr, $_temp_wr_total);
 
         return $_result;
+    }
+
+    private function _fetchData()
+    {
+        $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
     }
 }

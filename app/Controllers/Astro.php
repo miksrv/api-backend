@@ -4,7 +4,7 @@ use FITLibrary;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
-
+header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
 
 /**
  * Class Astro
@@ -57,7 +57,7 @@ class Astro extends BaseController
         switch ($action) {
             case 'fit' :
                 $fileID = $this->request->getGet('id');
-                $result = $FITData->delete();
+                $result = $FITData->delete($fileID);
 
                 if ($result)
                     log_message('info', '[' .  __METHOD__ . '] FIT file (' . $fileID . ') deleted');
