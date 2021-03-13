@@ -64,6 +64,10 @@ app.narodmon.alt = 80
 app.observatory.url = http://observatory.local/
 app.observatory.webcam = http://observatory.local/webcamphoto
 
+app.vkapi.token   =
+app.vkapi.domain  =
+app.vkapi.version = 5.145
+
 app.user_login = user
 app.user_passw = password
 app.user_session_time = 60
