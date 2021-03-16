@@ -241,10 +241,17 @@ class FITLibrary
      */
     protected function _get_statistic($data): object
     {
-        $total_exp = 0;
+        $total_exp  = 0;
+        $enable_key = [
+            'file_id', 'item_file_name', 'item_exptime', 'item_date_obs',
+            'item_filter', 'item_object', 'item_ccd_temp', 'item_offset', 'item_gain'
+        ];
 
         foreach ($data as $row)
         {
+            foreach ($row as $key => $item)
+                if ( ! in_array($key, $enable_key)) unset($row->$key);
+
             $total_exp += $row->item_exptime;
         }
 
