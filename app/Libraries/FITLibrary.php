@@ -11,6 +11,8 @@ class FITLibrary
     function __construct()
     {
         $this->_dataModel = model('App\Models\FITsData');
+        
+        helper(['transform']);
     }
 
     function create_fit_array($data): array
@@ -18,30 +20,30 @@ class FITLibrary
         return $this->fit_header = [
             'file_id'        => md5($data->FILE_NAME),
             'item_file_name' => $data->FILE_NAME,
-            'item_ypixsz'    => floatval($data->YPIXSZ),
-            'item_xpixsz'    => floatval($data->XPIXSZ),
-            'item_naxis1'    => intval($data->NAXIS1),
-            'item_naxis2'    => intval($data->NAXIS2),
-            'item_naxis'     => intval($data->NAXIS),
-            'item_bscale'    => intval($data->BSCALE),
-            'item_simple'    => intval($data->SIMPLE),
-            'item_bitpix'    => intval($data->BITPIX),
-            'item_xbinning'  => intval($data->XBINNING),
-            'item_ybinning'  => intval($data->YBINNING),
-            'item_exptime'   => intval($data->EXPTIME),
-            'item_frame'     => $data->FRAME,
-            'item_aptdia'    => intval($data->APTDIA),
-            'item_focallen'  => intval($data->FOCALLEN),
+            'item_ypixsz'    => isset($data->YPIXSZ) ? floatval($data->YPIXSZ) : NULL,
+            'item_xpixsz'    => isset($data->XPIXSZ) ? floatval($data->XPIXSZ) : NULL,
+            'item_naxis1'    => isset($data->NAXIS1) ? intval($data->NAXIS1) : NULL,
+            'item_naxis2'    => isset($data->NAXIS2) ? intval($data->NAXIS2) : NULL,
+            'item_naxis'     => isset($data->NAXIS) ? intval($data->NAXIS) : NULL,
+            'item_bscale'    => isset($data->BSCALE) ? intval($data->BSCALE) : 0,
+            'item_simple'    => isset($data->SIMPLE) ? intval($data->SIMPLE) : NULL,
+            'item_bitpix'    => isset($data->BITPIX) ? intval($data->BITPIX) : NULL,
+            'item_xbinning'  => isset($data->XBINNING) ? intval($data->XBINNING) : NULL,
+            'item_ybinning'  => isset($data->YBINNING) ? intval($data->YBINNING) : NULL,
+            'item_exptime'   => isset($data->EXPTIME) ? intval($data->EXPTIME) : NULL,
+            'item_frame'     => isset($data->FRAME) ? $data->FRAME : NULL,
+            'item_aptdia'    => isset($data->APTDIA) ? intval($data->APTDIA) : NULL,
+            'item_focallen'  => isset($data->FOCALLEN) ? intval($data->FOCALLEN) : NULL,
             'item_comment'   => $data->COMMENT,
             'item_telescop'  => $data->TELESCOP,
             'item_observer'  => $data->OBSERVER,
             'item_instrume'  => $data->INSTRUME,
-            'item_pixsize1'  => floatval($data->PIXSIZE1),
-            'item_pixsize2'  => floatval($data->PIXSIZE2),
+            'item_pixsize1'  => isset($data->PIXSIZE1) ? floatval($data->PIXSIZE1) : NULL,
+            'item_pixsize2'  => isset($data->PIXSIZE2) ? floatval($data->PIXSIZE2) : NULL,
             'item_ccd_temp'  => floatval($data->CCD_TEMP),
             'item_offset'    => intval($data->OFFSET),
             'item_gain'      => intval($data->GAIN),
-            'item_scale'     => floatval($data->SCALE),
+            'item_scale'     => isset($data->SCALE) ? floatval($data->SCALE) : NULL,
             'item_date_obs'  => $data->DATE_OBS,
             'item_equinox'   => $data->EQUINOX,
             'item_filter'    => $data->FILTER,
@@ -52,7 +54,7 @@ class FITLibrary
             'item_objctra'   => $data->OBJCTRA,
             'item_sitelong'  => floatval($data->SITELONG),
             'item_sitelat'   => floatval($data->SITELAT),
-            'item_bzero'     => intval($data->BZERO),
+            'item_bzero'     => isset($data->BZERO) ? intval($data->BZERO) : 0,
             'item_extend'    => $data->EXTEND,
             'item_airmass'   => floatval($data->AIRMASS),
 
@@ -99,8 +101,6 @@ class FITLibrary
      */
     public function statistics(): object
     {
-        helper(['transform']);
-
         $dataFITs = $this->_dataModel->get_all();
 
         $total_frame = $total_exp = 0;
@@ -222,6 +222,36 @@ class FITLibrary
     function statistics_object($name): object
     {
         return $this->_get_statistic($this->_dataModel->get_by_name($name));
+    }
+    
+    function full_stat_item($name, $shooting_date = null ): object
+    {
+        $data = $this->_dataModel->get_by_name($name);
+
+        $result = (object) [
+            'exp'  => 0,
+            'shot' => 0,
+            'Luminance' => 0,
+            'Red' => 0,
+            'Green' => 0,
+            'Blue' => 0,
+            'Ha' => 0,
+            'OIII' => 0,
+            'SII' => 0,
+        ];
+        
+        foreach ($data as $row)
+        {
+            if (strtotime($row->item_date_obs) > strtotime($shooting_date) || $row->item_frame != 'Light') continue;
+
+            $filterName = $row->item_filter;
+
+            $result->exp  += $row->item_exptime;
+            $result->shot += 1;
+            $result->$filterName += $row->item_exptime;
+        }
+        
+        return $result;
     }
 
     /**

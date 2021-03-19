@@ -12,6 +12,7 @@ header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
  */
 class Astro extends BaseController
 {
+
     function set($action)
     {
         $FITData = new FITLibrary();
