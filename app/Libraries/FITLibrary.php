@@ -224,9 +224,9 @@ class FITLibrary
         return $this->_get_statistic($this->_dataModel->get_by_name($name));
     }
     
-    function full_stat_item($name, $shooting_date = null ): object
+    function full_stat_item($name, $shooting_date = null, $data = []): object
     {
-        $data = $this->_dataModel->get_by_name($name);
+        $data = empty($data) ? $this->_dataModel->get_by_name($name) : $data;
 
         $result = (object) [
             'exp'  => 0,
@@ -242,7 +242,7 @@ class FITLibrary
         
         foreach ($data as $row)
         {
-            if (strtotime($row->item_date_obs) > strtotime($shooting_date) || $row->item_frame != 'Light') continue;
+            if ($shooting_date !== null && strtotime($row->item_date_obs) > strtotime($shooting_date)) continue;
 
             $filterName = $row->item_filter;
 
@@ -286,11 +286,12 @@ class FITLibrary
         }
 
         return (object) [
-            'result'   => count($data) > 0,
-            'data'     => $data,
-            'exposure' => $total_exp,
-            'filesize' => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
-            'frames'   => count($data)
+            'result'    => count($data) > 0,
+            'data'      => $data,
+            'exposure'  => $total_exp,
+            'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
+            'frames'    => count($data),
+            'statistic' => $this->full_stat_item('', null, $data)
         ];
     }
 }

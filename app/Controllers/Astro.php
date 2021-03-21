@@ -107,7 +107,6 @@ class Astro extends BaseController
                 break;
 
             // FIT file data for object by name
-            // #TODO Уменьшить количество отдаваемых данных клиенту
             case 'fit_object_stats' :
                 $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
 
