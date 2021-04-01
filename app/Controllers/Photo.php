@@ -17,6 +17,7 @@ class Photo extends BaseController
     {
         $PhotoModel = new PhotoModel();
         $FITData = new FITLibrary();
+        $request = \Config\Services::request();
 
         switch ($action)
         {
@@ -27,14 +28,13 @@ class Photo extends BaseController
 
             // Statistics for graphing by sensors in the observatory
             case 'item' :
-                $request = \Config\Services::request();
-                $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
-                
+                $objName   = $request->getVar('name', FILTER_SANITIZE_STRING);
                 $dataPhoto = $PhotoModel->get_by_name($objName);
 
                 if (empty($dataPhoto)) {
                     log_message('error', '[' . __METHOD__ . '] Empty photo data (' . json_encode($objName) . ')');
-                    return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
+                    $this->response->setJSON(['status' => false])->send();
+                    exit();
                 }
 
                 $dataPhoto[0]->status    = true;
@@ -42,6 +42,23 @@ class Photo extends BaseController
 
                 $this->response->setJSON($dataPhoto[0])->send();
                 break;
+                
+            case 'download' :
+                $objName  = $request->getVar('name', FILTER_SANITIZE_STRING);
+                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/photo/' . $objName . '.jpg';
+
+                if ( ! file_exists($filePath)) {
+                    throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+                }
+
+                $file_url = 'http://www.myremoteserver.com/file.exe';
+                header('Content-Type: application/octet-stream');
+                header("Content-Transfer-Encoding: Binary"); 
+                header("Content-disposition: attachment; filename=\"" . basename($filePath) . "\""); 
+                readfile($filePath); 
+
+                break;
+                
 
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }

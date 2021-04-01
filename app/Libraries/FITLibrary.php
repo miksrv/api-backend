@@ -286,7 +286,7 @@ class FITLibrary
         }
 
         return (object) [
-            'result'    => count($data) > 0,
+            'status'    => count($data) > 0,
             'data'      => $data,
             'exposure'  => $total_exp,
             'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
