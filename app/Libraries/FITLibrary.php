@@ -6,7 +6,8 @@ class FITLibrary
     protected $_dataModel;
 
     // FIT file size in byte for 16 bit mask
-    const FIT_FILE_SIZE = 32785920;
+    const FIT_FILE_SIZE = 32785920; #DEPRECATED
+    const FITS_FILE_SIZE = 32.78592; // in Mb
 
     function __construct()
     {
@@ -223,7 +224,8 @@ class FITLibrary
     {
         return $this->_get_statistic($this->_dataModel->get_by_name($name));
     }
-    
+
+    #DEPRECATED!
     function full_stat_item($name, $shooting_date = null, $data = []): object
     {
         $data = empty($data) ? $this->_dataModel->get_by_name($name) : $data;
@@ -251,6 +253,42 @@ class FITLibrary
             $result->$filterName += $row->item_exptime;
         }
         
+        return $result;
+    }
+
+    function get_fits_stat($data = [], $name = null, $shooting_date = null): object
+    {
+        if (empty($data)) $data = $this->_dataModel->get_by_name($name);
+
+        $result = (object) [
+            'exp'  => 0,
+            'shot' => 0,
+            'size' => 0,
+            'filters' => (object) [
+                'Luminance' => (object) ['exp' => 0, 'shot' => 0],
+                'Red'       => (object) ['exp' => 0, 'shot' => 0],
+                'Green'     => (object) ['exp' => 0, 'shot' => 0],
+                'Blue'      => (object) ['exp' => 0, 'shot' => 0],
+                'Ha'        => (object) ['exp' => 0, 'shot' => 0],
+                'OIII'      => (object) ['exp' => 0, 'shot' => 0],
+                'SII'       => (object) ['exp' => 0, 'shot' => 0]
+            ]
+        ];
+
+        foreach ($data as $row)
+        {
+            if ($shooting_date !== null && strtotime($row->item_date_obs) > strtotime($shooting_date)) continue;
+
+            $filterName = $row->item_filter;
+
+            $result->exp  += $row->item_exptime;
+            $result->shot += 1;
+            $result->filters->$filterName->exp  += $row->item_exptime;
+            $result->filters->$filterName->shot += 1;
+        }
+
+        $result->size = round($result->shot * self::FITS_FILE_SIZE);
+
         return $result;
     }
 
@@ -286,8 +324,11 @@ class FITLibrary
         }
 
         return (object) [
-            'status'    => count($data) > 0,
-            'data'      => $data,
+            'status' => count($data) > 0,
+            'stats'  => $this->get_fits_stat($data),
+            'files'  => $data,
+
+            'data'      => $data, // DEPRECATED!
             'exposure'  => $total_exp,
             'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
             'frames'    => count($data),
