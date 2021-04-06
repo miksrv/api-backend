@@ -37,7 +37,8 @@ class Photo extends BaseController
                     exit();
                 }
 
-                $dataPhoto[0]->status    = true;
+                $dataPhoto[0]->status = true;
+                $dataPhoto[0]->stats  = $FITData->get_fits_stat([], $objName, $dataPhoto[0]->photo_date);
                 $dataPhoto[0]->statistic = $FITData->full_stat_item($objName, $dataPhoto[0]->photo_date);
 
                 $this->response->setJSON($dataPhoto[0])->send();
