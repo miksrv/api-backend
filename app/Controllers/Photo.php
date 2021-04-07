@@ -43,7 +43,7 @@ class Photo extends BaseController
 
                 $this->response->setJSON($dataPhoto[0])->send();
                 break;
-                
+
             case 'download' :
                 $objName  = $request->getVar('name', FILTER_SANITIZE_STRING);
                 $filePath = $_SERVER['DOCUMENT_ROOT'] . '/photo/' . $objName . '.jpg';
@@ -59,7 +59,6 @@ class Photo extends BaseController
                 readfile($filePath); 
 
                 break;
-                
 
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
