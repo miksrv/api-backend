@@ -332,7 +332,6 @@ class FITLibrary
             'exposure'  => $total_exp,
             'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
             'frames'    => count($data),
-            'statistic' => $this->full_stat_item('', null, $data)
         ];
     }
 }
