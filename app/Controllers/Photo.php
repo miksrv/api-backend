@@ -51,7 +51,6 @@ class Photo extends BaseController
                     throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
                 }
 
-                $file_url = 'http://www.myremoteserver.com/file.exe';
                 header('Content-Type: application/octet-stream');
                 header("Content-Transfer-Encoding: Binary"); 
                 header("Content-disposition: attachment; filename=\"" . basename($filePath) . "\""); 

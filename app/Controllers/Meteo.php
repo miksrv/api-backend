@@ -41,8 +41,18 @@ class Meteo extends BaseController
                 break;
 
             case 'statistic' :
-                $Sensors->set_date($this->_get_date('date'));
-                $this->response->setJSON( $Sensors->statistic() )->send();
+                $period = $this->_get_period();
+                
+                $_cache_name = "statistic_{$period->start}_{$period->end}";
+
+                if ( ! $_archive_data = json_decode(cache($_cache_name)))
+                {
+                    $Sensors->set_range($period->start, $period->end);
+                    $_archive_data = $Sensors->statistic();
+                    cache()->save($_cache_name, json_encode($_archive_data), 60*5);
+                }
+
+                $this->response->setJSON( $_archive_data )->send();
                 break;
 
             case 'forecast' :
@@ -91,7 +101,7 @@ class Meteo extends BaseController
         $date_end   = $this->_get_date('date_end');
 
         if ( ! $date_start || ! $date_end) return (object) [
-            'start' => date('Y-m-01'),
+            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 days')), // Y-m-01
             'end'   => date('Y-m-d'),
         ];
 

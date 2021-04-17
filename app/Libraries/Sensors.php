@@ -35,6 +35,11 @@ class Sensors {
         // NEW period
         $this->date  = (isset($param['date']) ? $param['date'] : null);
         $this->range = (isset($param['daterange']) ? $param['daterange'] : null);
+        
+        if ( ! $this->range) $this->range = (object) [
+            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 days')),
+            'end'   => date('Y-m-d')
+        ];
     }
 
     function set_range($start, $end)
@@ -127,10 +132,13 @@ class Sensors {
 
         if (empty($this->_data)) return (object) [];
 
-        $this->_make_graph_data($this->period);
+        $this->_make_graph_data($this->period); // DEPRECATED PERIOD
 
         return (object) [
-            'period' => $this->period,
+            'period' => (object) [
+                'start' => $this->range->start,
+                'end'   => $this->range->end
+            ],
             'update' => strtotime($this->update),
             'date'   => $this->date,
             'data'   => $this->_data
@@ -182,6 +190,38 @@ class Sensors {
 
         $this->_data = $temp;
     }
+    
+    
+    /**
+     *
+// '%y Year %m Month %d Day %h Hours %i Minute %s Seconds'        =>  1 Year 3 Month 14 Day 11 Hours 49 Minute 36 Seconds
+// '%y Year %m Month %d Day'                                    =>  1 Year 3 Month 14 Days
+// '%m Month %d Day'                                            =>  3 Month 14 Day
+// '%d Day %h Hours'                                            =>  14 Day 11 Hours
+// '%d Day'                                                        =>  14 Days
+// '%h Hours %i Minute %s Seconds'                                =>  11 Hours 49 Minute 36 Seconds
+// '%i Minute %s Seconds'                                        =>  49 Minute 36 Seconds
+// '%h Hours                                                    =>  11 Hours
+// '%a Days                                                        =>  468 Days
+     */
+    private function _get_period($differenceFormat = '%a') {
+        $datetime1 = date_create($this->range->start);
+        $datetime2 = date_create($this->range->end);
+       
+        $interval = date_diff($datetime1, $datetime2);
+       
+        return (int) $interval->format($differenceFormat);
+    }
+    
+    private function _get_period_сoefficient() {
+        $period = $this->_get_period();
+
+        if ($period === 0) return 8*60;
+        if ($period >= 6 && $period <= 7) return 60*60;
+        if ($period >= 8) return 300*60;
+        
+        return 10*60;
+    } 
 
     /**
      * Make and return graph data array
@@ -198,12 +238,15 @@ class Sensors {
         $_temp_wr  = create_wind_rose_array(); // Wind rose array
         $_temp_wr_total = 0; // Wind rose count items
 
-        switch ($period) {
-            case 'today'     :
-            case 'yesterday' : $period = '600'; break;
-            case 'week'      : $period = '3600'; break;
-            case 'month'     : $period = '18000'; break;
-        }
+        // DEPRECATED
+        // switch ($period) {
+        //     case 'today'     :
+        //     case 'yesterday' : $period = '600'; break;
+        //     case 'week'      : $period = '3600'; break;
+        //     case 'month'     : $period = '18000'; break;
+        // }
+        
+        $period = $this->_get_period_сoefficient();
 
         foreach ($this->_data as $num => $item)
         {
@@ -329,6 +372,11 @@ class Sensors {
 
     private function _fetchData()
     {
+        if ($this->_get_period() > 30) {
+            $this->range->start = date('Y-m-d', strtotime(date('Y-m-d') . '-1 days'));
+            $this->range->end   = date('Y-m-d');
+        }
+        
         $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
     }
 }
