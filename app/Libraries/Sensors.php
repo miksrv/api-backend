@@ -37,7 +37,7 @@ class Sensors {
         $this->range = (isset($param['daterange']) ? $param['daterange'] : null);
         
         if ( ! $this->range) $this->range = (object) [
-            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 days')),
+            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-12 hours')),
             'end'   => date('Y-m-d')
         ];
     }

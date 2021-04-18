@@ -101,7 +101,7 @@ class Meteo extends BaseController
         $date_end   = $this->_get_date('date_end');
 
         if ( ! $date_start || ! $date_end) return (object) [
-            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 days')), // Y-m-01
+            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-12 hours')), // Y-m-01
             'end'   => date('Y-m-d'),
         ];
 
