@@ -81,6 +81,14 @@ class Astro extends BaseController
 
             // Statistics for graphing by sensors in the observatory
             case 'statistic' :
+
+                if ($this->request->getGet('dataset'))
+                {
+                    $dataset = explode(',', $this->request->getGet('dataset'));
+
+                    if (is_array($dataset)) $Sensors->set_dataset($dataset);
+                }
+
                 $this->response->setJSON( $Sensors->statistic() )->send();
                 break;
 
