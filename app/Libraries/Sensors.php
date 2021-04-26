@@ -4,15 +4,16 @@ class Sensors {
 
     protected $_data;
     protected $_source;
-    protected $_periods = ['today', 'yesterday', 'week', 'month'];
     protected $_dataModel;
 
     protected $dataset = [];
     protected $update;
     protected $period;
-    protected $date;
     protected $range;
     protected $dewpoint;
+
+    private $_default_start;
+    private $_default_end;
 
     /**
      * Sensors constructor.
@@ -29,27 +30,32 @@ class Sensors {
         $this->_source    = isset($param['source']) ? $param['source'] : 'meteo';
 
         $this->dataset  = (isset($param['dataset']) && is_array($param['dataset'])) ? $param['dataset'] : [];
-        $this->period   = (isset($param['period']) && in_array($param['period'], $this->_periods)) ? $param['period'] : $this->_periods[0];
         $this->dewpoint = (isset($param['dewpoint']['t']) && isset($param['dewpoint']['h'])) ? $param['dewpoint'] : null;
 
-        // NEW period
-        $this->date  = (isset($param['date']) ? $param['date'] : null);
-        $this->range = (isset($param['daterange']) ? $param['daterange'] : null);
-        
+        $this->_default_start = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . '-12 hours'));
+        $this->_default_end   = date('Y-m-d H:i:s');
+
+        //$this->range = (isset($param['daterange']) ? $param['daterange'] : null);
+
+        if (isset($param['daterange']) && is_object($param['daterange']))
+        {
+            $this->_get_range($param['daterange']);
+        }
+
         if ( ! $this->range) $this->range = (object) [
-            'start' => date('Y-m-d', strtotime(date('Y-m-d') . '-12 hours')),
-            'end'   => date('Y-m-d')
+            'start' => $this->_default_start,
+            'end'   => $this->_default_end,
         ];
     }
 
     function set_range($start, $end)
     {
-        $this->range = (object) ['start' => $start, 'end' => $end];
+        $this->_get_range((object) ['start' => $start, 'end' => $end]);
     }
-
-    function set_date($date)
+    
+    function set_dataset($dataset)
     {
-        $this->date = $date;
+        $this->dataset = (! empty($dataset) && is_array($dataset)) ? $dataset : [];
     }
 
     function archive(): object
@@ -117,30 +123,26 @@ class Sensors {
         if (empty($this->_data)) return (object) [];
  
         $this->_make_summary_data();
-
-        return (object) [
-            'period' => $this->period,
-            'update' => strtotime($this->update),
-            'date'   => $this->date,
-            'data'   => $this->_data
-        ];
+        return $this->_response();
     }
 
     function statistic(): ?object
     {
         $this->_fetchData();
 
-        if (empty($this->_data)) return (object) [];
+        if ( ! empty($this->_data)) $this->_make_graph_data();
 
-        $this->_make_graph_data($this->period); // DEPRECATED PERIOD
-
+        return $this->_response();
+    }
+    
+    protected function _response()
+    {
         return (object) [
             'period' => (object) [
                 'start' => $this->range->start,
                 'end'   => $this->range->end
             ],
             'update' => strtotime($this->update),
-            'date'   => $this->date,
             'data'   => $this->_data
         ];
     }
@@ -191,6 +193,20 @@ class Sensors {
         $this->_data = $temp;
     }
     
+    protected function _get_range($range)
+    {
+        #todo Пофиксить баг с отсчетом 12 часов от текущего времени
+        $this->range = (object) [
+            'start' => ($range->start === $range->end) ? date('Y-m-d H:i:s', strtotime($range->start . '-12 hours')) 
+                                                       : date('Y-m-d 00:00:00', strtotime($range->start)),
+            'end'   => date('Y-m-d ' . ($range->end < date('Y-m-d') ? '23:59:59' : date('H:i:s')), strtotime($range->end)),
+        ];
+        
+        // echo '<pre>';
+        // var_dump($range);
+        // var_dump($this->range);
+        // exit();
+    }
     
     /**
      *
@@ -228,7 +244,7 @@ class Sensors {
      * @param $period string (today|yesterday|week|month)
      * @return array|void
      */
-    protected function _make_graph_data(string $period): array
+    protected function _make_graph_data(): array
     {
         $_counter   = 0; // Iteration counter
         $_prev_time = 0; // First iteration timestamp
@@ -237,14 +253,6 @@ class Sensors {
         $_temp_wd  = [0, 0, 0, 0, 0, 0, 0, 0]; // Array of wind directions (8 bit)
         $_temp_wr  = create_wind_rose_array(); // Wind rose array
         $_temp_wr_total = 0; // Wind rose count items
-
-        // DEPRECATED
-        // switch ($period) {
-        //     case 'today'     :
-        //     case 'yesterday' : $period = '600'; break;
-        //     case 'week'      : $period = '3600'; break;
-        //     case 'month'     : $period = '18000'; break;
-        // }
         
         $period = $this->_get_period_сoefficient();
 
@@ -278,9 +286,10 @@ class Sensors {
             foreach ($item->item_raw_data as $key => $val)
             {
                 // if key not in request data set array, then continue
-                //if ( ! in_array($key, $this->dataset)) continue;
-
+                if ( ! empty($this->dataset) && ! in_array($key, $this->dataset)) continue;
                 if ( ! isset($_temp_val[$key])) $_temp_val[$key] = 0;
+                if ($key === 'uv' && $val <= 0.3) $val = 0;
+                if ($key === 'p1' || $key === 'p2' || $key === 'p3') $val = $val / 1000;
 
                 // if key is wind direction
                 if ($key === 'wd')
@@ -373,10 +382,10 @@ class Sensors {
     private function _fetchData()
     {
         if ($this->_get_period() > 30) {
-            $this->range->start = date('Y-m-d', strtotime(date('Y-m-d') . '-1 days'));
-            $this->range->end   = date('Y-m-d');
+            $this->range->start = $this->_default_start;
+            $this->range->end   = $this->_default_end;
         }
         
-        $this->_data = $this->_dataModel->get_period($this->_source, $this->period, $this->date, $this->range);
+        $this->_data = $this->_dataModel->get_period($this->_source, $this->range);
     }
 }
