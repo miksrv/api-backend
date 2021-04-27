@@ -51,6 +51,20 @@ class Meteo extends BaseController
                 $this->response->setJSON( $_archive_data )->send();
                 break;
 
+            case 'csv' :
+                $_cache_name = "csv_{$period->start}_{$period->end}";
+                $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5;
+
+                if ( ! $_archive_data = json_decode(cache($_cache_name)))
+                {
+                    $Sensors->set_range($period->start, $period->end);
+                    $_archive_data = $Sensors->csv();
+                    cache()->save($_cache_name, json_encode($_archive_data), $_cache_time);
+                }
+
+                $this->_download_csv($_cache_name . '.csv', $_archive_data);
+                break;
+
             case 'forecast' :
                 $OpenWeather = new \OpenWeather();
                 $this->response->setJSON( $OpenWeather->get_forecast() )->send();
@@ -76,6 +90,22 @@ class Meteo extends BaseController
 
             default : throw PageNotFoundException::forPageNotFound();
         }
+    }
+
+    protected function _download_csv($name, $data)
+    {
+        header("Content-Description: File Transfer");
+        header("Content-Disposition: attachment; filename={$name}");
+        header("Content-Type: application/csv; ");
+
+        $file = fopen('php://output', 'w');
+        foreach ($data as $line)
+        {
+            fputcsv($file, $line);
+        }
+
+        fclose($file);
+        exit();
     }
 
     protected function _get_date($param_name) {

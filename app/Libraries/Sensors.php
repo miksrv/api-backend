@@ -134,8 +134,15 @@ class Sensors {
 
         return $this->_response();
     }
+
+    function csv(): ?array
+    {
+        $this->_fetchData();
+
+        return $this->_make_csv_data();
+    }
     
-    protected function _response()
+    protected function _response(): object
     {
         return (object) [
             'period' => (object) [
@@ -237,7 +244,36 @@ class Sensors {
         if ($period >= 8) return 300*60;
         
         return 10*60;
-    } 
+    }
+
+    protected function _make_csv_data(): array
+    {
+        $_headers = ['date'];
+        $_result  = [];
+
+        foreach ($this->_data as $num => $item)
+        {
+            $sensorObject = json_decode($item->item_raw_data);
+            $_tmp_result  = [$item->item_timestamp];
+
+            foreach ($sensorObject as $name => $sensor) {
+                if ($num === 0) $_headers[] = $name;
+                $_tmp_result[] = $sensor;
+            }
+
+            if ($num === 0)
+            {
+                $_result[] = $_headers;
+                unset($_headers);
+            }
+
+            $_result[] = $_tmp_result;
+
+            unset($_tmp_result);
+        }
+
+        return $_result;
+    }
 
     /**
      * Make and return graph data array
