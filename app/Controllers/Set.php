@@ -38,10 +38,6 @@ class Set extends BaseController
         $this->_check_token();
         $this->_fetch_data();
 
-        // DEPRECATED
-        // 'item_token' => $this->_token,
-        // 'item_client_ip' => $this->request->getIPAddress(),
-
         $db = \Config\Database::connect();
         $db->table($_dataTable)->insert([
             'item_id'        => uniqid(),
@@ -76,7 +72,6 @@ class Set extends BaseController
 
         $this->_response($response, 200);
     }
-
 
     /**
      * Send data to narodmon
@@ -183,10 +178,7 @@ class Set extends BaseController
      */
     protected function _check_token()
     {
-        if (isset($this->source->id) && $this->source->id === $this->_token)
-        {
-            return ;
-        }
+        if (isset($this->source->id) && $this->source->id === $this->_token) return ;
 
         $response = ['state' => FALSE, 'error' => 'The device identifier is missing or incorrect'];
         $log_data = ['m' => __METHOD__, 'e' => $response['error'], 'd' => json_encode($this->source)];
@@ -199,6 +191,7 @@ class Set extends BaseController
     /**
      * Generates an answer for the client
      * @param $data
+     * @param int $code
      */
     protected function _response($data, $code = 400)
     {
@@ -209,5 +202,4 @@ class Set extends BaseController
 
         exit();
     }
-
 }
