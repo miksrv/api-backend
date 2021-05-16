@@ -16,6 +16,11 @@ class FITLibrary
         helper(['transform']);
     }
 
+    /**
+     * Create array from input FITS file data
+     * @param $data
+     * @return array
+     */
     function create_fit_array($data): array
     {
         return $this->fit_header = [
@@ -163,6 +168,12 @@ class FITLibrary
         ];
     }
 
+    /**
+     * Create month archive stats per day
+     * @param null $month
+     * @param null $year
+     * @return object
+     */
     function archive($month = null, $year = null): object
     {
         if (empty($month) || empty($year))
@@ -225,37 +236,13 @@ class FITLibrary
         return $this->_get_statistic($this->_dataModel->get_by_name($name));
     }
 
-    #DEPRECATED!
-    function full_stat_item($name, $shooting_date = null, $data = []): object
-    {
-        $data = empty($data) ? $this->_dataModel->get_by_name($name) : $data;
-
-        $result = (object) [
-            'exp'  => 0,
-            'shot' => 0,
-            'Luminance' => 0,
-            'Red' => 0,
-            'Green' => 0,
-            'Blue' => 0,
-            'Ha' => 0,
-            'OIII' => 0,
-            'SII' => 0,
-        ];
-        
-        foreach ($data as $row)
-        {
-            if ($shooting_date !== null && strtotime($row->item_date_obs) > strtotime($shooting_date)) continue;
-
-            $filterName = $row->item_filter;
-
-            $result->exp  += $row->item_exptime;
-            $result->shot += 1;
-            $result->$filterName += $row->item_exptime;
-        }
-        
-        return $result;
-    }
-
+    /**
+     * Create stats array from input FITS data
+     * @param array $data
+     * @param null $name
+     * @param null $shooting_date
+     * @return object
+     */
     function get_fits_stat($data = [], $name = null, $shooting_date = null): object
     {
         if (empty($data)) $data = $this->_dataModel->get_by_name($name);
