@@ -16,7 +16,6 @@ class SensorData extends Model
 
     /**
      * Return sensor data in period
-     * #TODO Optimize
      * @return mixed
      */
     public function get_period($source = 'meteo', $daterange = null)
@@ -25,12 +24,17 @@ class SensorData extends Model
 
         return $this->db->table($this->table)
             ->where("item_timestamp BETWEEN '{$daterange->start}' AND '{$daterange->end}'")
-            // ->where("DATE_FORMAT(item_timestamp, '%Y-%m-%d') BETWEEN '{$daterange->start}' AND '{$daterange->end}'")
             ->orderBy('item_timestamp', 'DESC')
             ->get()
             ->getResult();
     }
 
+    /**
+     * Return sensor data by month
+     * @param $month
+     * @param $year
+     * @return mixed
+     */
     public function get_month($month, $year)
     {
         $this->table = getenv('database.table.meteo_data');
