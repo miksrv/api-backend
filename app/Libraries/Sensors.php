@@ -48,6 +48,11 @@ class Sensors {
         ];
     }
 
+    function clear_old_entries()
+    {
+        return $this->_dataModel->clear_old_entries();
+    }
+
     function set_range($start, $end)
     {
         $this->_get_range((object) ['start' => $start, 'end' => $end]);

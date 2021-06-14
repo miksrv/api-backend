@@ -40,6 +40,11 @@ class Astro extends BaseController
         }
     }
 
+    public function clear()
+    {
+        $Sensors = new \Sensors(['source' => 'astro']);
+    }
+
     public function delete($action)
     {
         $token = $this->request->getHeaderLine('authtoken');

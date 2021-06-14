@@ -29,6 +29,14 @@ class SensorData extends Model
             ->getResult();
     }
 
+    public function clear_old_entries()
+    {
+        $table = getenv('database.table.astro_data');
+        return $this->db->table($table)
+            ->where("item_timestamp < DATE_SUB(NOW(), INTERVAL 14 DAY)")
+            ->delete();
+    }
+
     /**
      * Return sensor data by month
      * @param $month
