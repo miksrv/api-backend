@@ -48,16 +48,29 @@ class Sensors {
         ];
     }
 
+    /**
+     * Remove old entites
+     * @return mixed
+     */
     function clear_old_entries()
     {
         return $this->_dataModel->clear_old_entries();
     }
 
+    /**
+     * Set date range for WHERE
+     * @param $start
+     * @param $end
+     */
     function set_range($start, $end)
     {
         $this->_get_range((object) ['start' => $start, 'end' => $end]);
     }
-    
+
+    /**
+     * Set dataset (sensor names for SELECT)
+     * @param $dataset
+     */
     function set_dataset($dataset)
     {
         $this->dataset = (! empty($dataset) && is_array($dataset)) ? $dataset : [];
