@@ -1,6 +1,9 @@
-<?php namespace App\Controllers;
+<?php
 
-use FITLibrary;
+namespace App\Controllers;
+
+use App\Libraries\FITLibrary;
+use App\Libraries\Sensors;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -42,7 +45,7 @@ class Astro extends BaseController
 
     public function clear()
     {
-        $Sensors = new \Sensors(['source' => 'astro']);
+        $Sensors = new Sensors(['source' => 'astro']);
     }
 
     public function delete($action)
@@ -74,7 +77,7 @@ class Astro extends BaseController
     function get($action)
     {
         $request = \Config\Services::request();
-        $Sensors = new \Sensors(['source' => 'astro']);
+        $Sensors = new Sensors(['source' => 'astro']);
         $FITData = new FITLibrary();
 
         switch ($action)

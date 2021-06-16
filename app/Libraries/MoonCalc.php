@@ -1,4 +1,9 @@
 <?php
+
+namespace App\Libraries;
+
+# DEPRECATED
+
 /**
  * Moon phase calculation class
  * Adapted for PHP from Moontool for Windows (http://www.fourmilab.ch/moontoolw/)

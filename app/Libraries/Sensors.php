@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Libraries;
+
 class Sensors {
 
     protected $_data;
@@ -194,8 +196,8 @@ class Sensors {
 
             try
             {
-                $_time_a = new DateTime($this->update);
-                $_time_b = new DateTime($item->item_timestamp);
+                $_time_a = new \DateTime($this->update);
+                $_time_b = new \DateTime($item->item_timestamp);
             } catch (Exception $e) {
                 $_time_a = $_time_b = null;
             }

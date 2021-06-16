@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Libraries;
+
 class FITLibrary
 {
     protected $fit_header = [];

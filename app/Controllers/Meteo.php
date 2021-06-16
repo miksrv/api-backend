@@ -1,7 +1,9 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Exceptions\PageNotFoundException;
-use Sensors;
+use App\Libraries\Sensors;
+use App\Libraries\OpenWeather;
+use App\Libraries\NooaData;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -66,7 +68,7 @@ class Meteo extends BaseController
                 break;
 
             case 'forecast' :
-                $OpenWeather = new \OpenWeather();
+                $OpenWeather = new OpenWeather();
                 $this->response->setJSON( $OpenWeather->get_forecast() )->send();
                 break;
 
@@ -84,7 +86,7 @@ class Meteo extends BaseController
                 break;
 
             case 'kindex' :
-                $NooaData = new \NooaData();
+                $NooaData = new NooaData();
                 $this->response->setJSON( $NooaData->get_kindex() )->send();
                 break;
 

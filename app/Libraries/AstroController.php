@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Libraries;
+
+# DEPRECATED
+
 class AstroController {
 
     protected $_data;

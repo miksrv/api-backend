@@ -1,7 +1,7 @@
 <?php namespace App\Controllers;
 
 use App\Models\PhotoModel;
-use FITLibrary;
+use App\Libraries\FITLibrary;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");

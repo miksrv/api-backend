@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Libraries;
+
+# DEPRECATED
+
 /******************************************************************************
  * The following is a PHP implementation of the JavaScript code found at:      *
  * http://bodmas.org/astronomy/riset.html                                      *

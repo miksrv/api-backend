@@ -1,4 +1,7 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
+use App\Libraries\UserAuth;
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
@@ -33,7 +36,7 @@ class Auth extends BaseController
             exit();
         }
 
-        $UserAuth = new \UserAuth();
+        $UserAuth = new UserAuth();
 
         $token = $UserAuth->do_login($userLogin);
 
