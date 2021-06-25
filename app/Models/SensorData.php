@@ -9,7 +9,7 @@ class SensorData extends Model
     protected $table = '';
     protected $db;
 
-    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
+    function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
         parent::__construct($db, $validation);
     }
@@ -18,9 +18,9 @@ class SensorData extends Model
      * Return sensor data in period
      * @return mixed
      */
-    public function get_period($source = 'meteo', $daterange = null)
+    function get_period($source = 'meteo', $daterange = null, $summary = false)
     {
-        $this->table = getenv('database.table.' . $source . '_data');
+        $this->table = getenv('database.table.' . $source . '_data') . ($summary ? '_total' : '');
 
         return $this->db->table($this->table)
             ->where("item_timestamp BETWEEN '{$daterange->start}' AND '{$daterange->end}'")
@@ -29,7 +29,7 @@ class SensorData extends Model
             ->getResult();
     }
 
-    public function clear_old_entries()
+    function clear_old_entries()
     {
         $table = getenv('database.table.astro_data');
         return $this->db->table($table)
@@ -43,7 +43,7 @@ class SensorData extends Model
      * @param $year
      * @return mixed
      */
-    public function get_month($month, $year)
+    function get_month($month, $year)
     {
         $this->table = getenv('database.table.meteo_data');
 
@@ -52,5 +52,81 @@ class SensorData extends Model
             ->orderBy('item_timestamp', 'DESC')
             ->getWhere(['YEAR(item_timestamp)' => $year, 'MONTH(item_timestamp)' => $month])
             ->getResult();
+    }
+
+
+
+
+
+    function get_sensor_by_hour($year, $month, $day, $hour)
+    {
+        $this->table = getenv('database.table.meteo_data');
+
+        return $this->db
+            ->table($this->table)
+            ->orderBy('item_timestamp', 'DESC')
+            ->getWhere([
+                'YEAR(item_timestamp)'  => $year,
+                'MONTH(item_timestamp)' => $month,
+                'DAY(item_timestamp)'   => $day,
+                'HOUR(item_timestamp)'  => $hour,
+                ])
+            ->getResult();
+    }
+
+    function get_sensor_by_min_date($date)
+    {
+        $this->table = getenv('database.table.meteo_data');
+
+        return $this->db
+            ->table($this->table)
+            ->orderBy('item_timestamp', 'ASC')
+            ->where('DATE(item_timestamp) >', $date)
+            ->limit(1)
+            ->get()
+            ->getResult();
+    }
+
+    function get_day_order()
+    {
+        $this->table = getenv('database.table.meteo_data');
+
+        return $this->db
+            ->table($this->table)
+            ->orderBy('item_timestamp', 'ASC')
+//            ->getWhere([
+//                'YEAR(item_timestamp)'  => $year,
+//                'MONTH(item_timestamp)' => $month,
+//                'DAY(item_timestamp)'   => $day])
+            //->getResult()
+            ->limit(1)
+            ->get()
+            ->getResult();
+    }
+
+    /**
+     * Получает последнюю по дате обощенную запись за час наблюдений
+     * @return mixed
+     */
+    function get_last($total = false)
+    {
+        $table = ($total ? 'meteo_data_total' : 'meteo_data');
+
+        return $this->db
+            ->table($table)
+            ->orderBy('item_timestamp', $total ? 'DESC' : 'ASC')
+            ->limit(1)
+            ->get()
+            ->getResult();
+    }
+
+    function set_total($data, $time)
+    {
+        return $this->db
+            ->table('meteo_data_total')->insert([
+                'item_id'        => uniqid(),
+                'item_raw_data'  => $data,
+                'item_timestamp' => $time
+            ]);
     }
 }

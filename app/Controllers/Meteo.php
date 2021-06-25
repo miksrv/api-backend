@@ -2,6 +2,7 @@
 
 use CodeIgniter\Exceptions\PageNotFoundException;
 use App\Libraries\Sensors;
+use App\Libraries\SensorsSummary;
 use App\Libraries\OpenWeather;
 use App\Libraries\NooaData;
 
@@ -35,11 +36,20 @@ class Meteo extends BaseController
 
         switch ($action)
         {
+            case 'test' :
+                $Summary = new SensorsSummary();
+                $Summary->run();
+                break;
+
             case 'summary' :
                 $this->response->setJSON( $Sensors->summary() )->send();
                 break;
 
             case 'statistic' :
+                ini_set('display_errors', 1);
+                ini_set('display_startup_errors', 1);
+                error_reporting(E_ALL);
+
                 $_cache_name = "statistic_{$period->start}_{$period->end}";
                 $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5; // 1 month or 5 min
 

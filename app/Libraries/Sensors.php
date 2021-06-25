@@ -261,8 +261,8 @@ class Sensors {
 
         if ($period === 0) return 8*60;
         if ($period >= 6 && $period <= 7) return 60*60;
-        if ($period >= 8) return 300*60;
-        
+        if ($period >= 8 && $period <= 14) return 300*60;
+
         return 10*60;
     }
 
@@ -437,11 +437,15 @@ class Sensors {
 
     private function _fetchData()
     {
+        $getSummary = false;
+
         if ($this->_get_period() > 30) {
-            $this->range->start = $this->_default_start;
-            $this->range->end   = $this->_default_end;
+//            $this->range->start = $this->_default_start;
+//            $this->range->end   = $this->_default_end;
+
+            $getSummary = true;
         }
         
-        $this->_data = $this->_dataModel->get_period($this->_source, $this->range);
+        $this->_data = $this->_dataModel->get_period($this->_source, $this->range, $getSummary);
     }
 }
