@@ -131,6 +131,25 @@ class Sensors {
         ];
     }
 
+    function heatmap(): object
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $this->set_range(
+            date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . '-10 months')),
+            date('Y-m-d H:i:s')
+        );
+
+        $this->_fetchData();
+
+        if (empty($this->_data)) return (object) [];
+
+        $this->_make_heatmap_data();
+        return $this->_response();
+    }
+
     /**
      * Array of objects for each sensor in the table
      * Current value, change per hour, max and minimum value for 24 hours
@@ -172,6 +191,30 @@ class Sensors {
             'update' => strtotime($this->update),
             'data'   => $this->_data
         ];
+    }
+
+    protected function _make_heatmap_data()
+    {
+        if (empty($this->_data)) return ;
+
+        $temp  = [];
+
+        foreach ($this->_data as $key => $item)
+        {
+            $_data  = json_decode($item->item_raw_data);
+            $_value = null;
+            $_time  = strtotime($item->item_timestamp);
+
+            foreach ($_data as $sensor => $val) {
+                if ($sensor !== 't1') continue;
+
+                $_value = $val;
+            }
+
+            $temp[] = [$_time * 1000, (int) date('H', $_time), $_value];
+        }
+
+        return $this->_data = $temp;
     }
 
     protected function _make_summary_data()

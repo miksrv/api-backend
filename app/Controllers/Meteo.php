@@ -41,6 +41,10 @@ class Meteo extends BaseController
                 $Summary->run();
                 break;
 
+            case 'heatmap' :
+                $this->response->setJSON( $Sensors->heatmap() )->send();
+                break;
+
             case 'summary' :
                 $this->response->setJSON( $Sensors->summary() )->send();
                 break;
