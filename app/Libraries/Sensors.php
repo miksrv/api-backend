@@ -2,6 +2,8 @@
 
 namespace App\Libraries;
 
+ini_set('memory_limit', '512M');
+
 class Sensors {
 
     protected $_data;
@@ -133,10 +135,6 @@ class Sensors {
 
     function heatmap(): object
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
         $this->set_range(
             date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . '-10 months')),
             date('Y-m-d H:i:s')
@@ -199,7 +197,7 @@ class Sensors {
 
         $temp  = [];
 
-        foreach ($this->_data as $key => $item)
+        foreach ($this->_data as $item)
         {
             $_data  = json_decode($item->item_raw_data);
             $_value = null;
@@ -213,6 +211,11 @@ class Sensors {
 
             $temp[] = [$_time * 1000, (int) date('H', $_time), $_value];
         }
+
+        $this->set_range(
+            date('Y-m-d H:i:s', strtotime($this->_data[0]->item_timestamp)),
+            date('Y-m-d H:i:s', strtotime($this->_data[array_key_last($this->_data)]->item_timestamp))
+        );
 
         return $this->_data = $temp;
     }
@@ -302,11 +305,12 @@ class Sensors {
     private function _get_period_сoefficient() {
         $period = $this->_get_period();
 
-        if ($period === 0) return 8*60;
-        if ($period >= 6 && $period <= 7) return 60*60;
-        if ($period >= 8 && $period <= 14) return 300*60;
-
-        return 10*60;
+        if ($period === 0) return 5*60; // 5 min
+        if ($period >= 1 && $period <=2) return 15*60; // 15 min
+        if ($period >= 3 && $period <=5) return 30*60; // 30 min
+        if ($period >= 6 && $period <= 7) return 60*60; // 1 hour
+        if ($period >= 8 && $period <= 14) return 300*60; // 5 hour
+        return 60*60*24; // 24 hour
     }
 
     protected function _make_csv_data(): array
@@ -482,13 +486,13 @@ class Sensors {
     {
         $getSummary = false;
 
-        if ($this->_get_period() > 30) {
+        if ($this->_get_period() > 30 && $this->_source === 'meteo') {
 //            $this->range->start = $this->_default_start;
 //            $this->range->end   = $this->_default_end;
 
             $getSummary = true;
         }
-        
+
         $this->_data = $this->_dataModel->get_period($this->_source, $this->range, $getSummary);
     }
 }

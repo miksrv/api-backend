@@ -34,11 +34,11 @@ class SensorsSummary {
             $lastTotalData = $this->_dataModel->get_last();
 
         $sensors = $this->_get_last_sensor_data($lastTotalData[0]->item_timestamp);
-        $summary = $this->_create_data_summary($sensors->data);
+        $dataset = $this->_create_data_summary($sensors->data);
         $dateSum = date('Y-m-d H:00:00', $sensors->time);
 
         $this->_get_date_diff_hours($dateSum);
-        $this->_set_total($summary, $dateSum);
+        $this->_set_total($dataset, $dateSum);
 
         if ($this->counter >= 100)
         {
@@ -75,18 +75,7 @@ class SensorsSummary {
         );
 
         if (empty($data) || ! is_array($data))
-        {
-            $time = date('Y-m-d H:i:s', $time);
-            $data = $this->_dataModel->get_sensor_by_min_date($time);
-
-            $time = strtotime($data[0]->item_timestamp);
-            $data = $this->_dataModel->get_sensor_by_hour(
-                date('Y', $time),
-                date('m', $time),
-                date('d', $time),
-                date('H', $time)
-            );
-        }
+            $data = $this->_get_empty_value($time, 1);
 
         return (object) [
             'data' => $data,
@@ -94,10 +83,45 @@ class SensorsSummary {
         ];
     }
 
-    protected function _create_data_summary($data): array
+    /**
+     * Если вдруг не получается выцепить значение следующего часа,
+     * то берется час предидущего дня
+     * @param $time
+     */
+    protected function _get_empty_value($time, $days) {
+        $prev_time = strtotime(date('Y-m-d H:i:s', $time) . " -{$days} days");
+        $prev_data = $this->_dataModel->get_sensor_by_hour(
+            date('Y', $prev_time),
+            date('m', $prev_time),
+            date('d', $prev_time),
+            date('H', $prev_time)
+        );
+
+        if (empty($prev_data))
+            return $this->_get_empty_value($time, $days + 1);
+
+        return $prev_data;
+//        $data = $this->_dataModel->get_sensor_by_min_date($time);
+//
+//        $time = strtotime($data[0]->item_timestamp);
+//        $data = $this->_dataModel->get_sensor_by_hour(
+//            date('Y', $time),
+//            date('m', $time),
+//            date('d', $time),
+//            date('H', $time)
+//        );
+
+//        echo '<pre>';
+//        var_dump(date('Y-m-d H:m:i', $time), date('Y-m-d H:m:i', $prev_time));
+//        var_dump($prev_data);
+//        exit();
+    }
+
+    protected function _create_data_summary($data): object
     {
         $count  = 0;
-        $result = [];
+        $summary = [];
+        $extreme = [];
 
         if ( ! empty($data))
         {
@@ -107,37 +131,42 @@ class SensorsSummary {
                 $sensorData = json_decode($item->item_raw_data);
                 foreach ($sensorData as $sensor => $value)
                 {
-                    if ( ! isset($result[$sensor]))
-                        $result[$sensor] = $value;
-                    else
-                        $result[$sensor] += $value;
+                    if ( ! isset($summary[$sensor]))
+                    {
+                        $summary[$sensor] = $value;
+                        $extreme[$sensor] = (object) ['min' => $value, 'max' => $value];
+                    } else {
+                        $summary[$sensor] += $value;
+                        if ($extreme[$sensor]->min > $value)
+                            $extreme[$sensor]->min = $value;
+                        if ($extreme[$sensor]->max < $value)
+                            $extreme[$sensor]->max = $value;
+                    }
                 }
             }
 
-            foreach ($result as $sensor => $value) {
-                $result[$sensor] = round($value / $count, 1);
+            foreach ($summary as $sensor => $value) {
+                $summary[$sensor] = round($value / $count, 1);
             }
         }
 
-        return $result;
+        return (object) ['summary' => $summary, 'extreme' => $extreme];
     }
 
-    protected function _set_total($data, $time)
+    protected function _set_total($dataset, $time)
     {
-        $data = json_encode($data);
+        if (empty($dataset->summary) || empty($dataset->extreme))
+        {
+            echo '<pre>';
+            var_dump($dataset);
+            exit();
+        }
 
-        return $this->_dataModel->set_total($data, $time);
+        $summary = json_encode($dataset->summary);
+        $extreme = json_encode($dataset->extreme);
+
+        return $this->_dataModel->set_total($summary, $extreme, $time);
     }
-
-
-
-
-
-
-
-
-
-
 
     function get_last_hour() {
         return $this->_dataModel->get_day_order();

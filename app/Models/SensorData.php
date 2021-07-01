@@ -4,6 +4,8 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
+ini_set('memory_limit', '512M');
+
 class SensorData extends Model
 {
     protected $table = '';
@@ -53,10 +55,6 @@ class SensorData extends Model
             ->getWhere(['YEAR(item_timestamp)' => $year, 'MONTH(item_timestamp)' => $month])
             ->getResult();
     }
-
-
-
-
 
     function get_sensor_by_hour($year, $month, $day, $hour)
     {
@@ -120,13 +118,14 @@ class SensorData extends Model
             ->getResult();
     }
 
-    function set_total($data, $time)
+    function set_total($summary, $extreme, $time)
     {
         return $this->db
             ->table('meteo_data_total')->insert([
-                'item_id'        => uniqid(),
-                'item_raw_data'  => $data,
-                'item_timestamp' => $time
+                'item_id'             => uniqid(),
+                'item_raw_data'       => $summary,
+                'item_extreme_values' => $extreme,
+                'item_timestamp'      => $time
             ]);
     }
 }
