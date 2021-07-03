@@ -101,20 +101,6 @@ class SensorsSummary {
             return $this->_get_empty_value($time, $days + 1);
 
         return $prev_data;
-//        $data = $this->_dataModel->get_sensor_by_min_date($time);
-//
-//        $time = strtotime($data[0]->item_timestamp);
-//        $data = $this->_dataModel->get_sensor_by_hour(
-//            date('Y', $time),
-//            date('m', $time),
-//            date('d', $time),
-//            date('H', $time)
-//        );
-
-//        echo '<pre>';
-//        var_dump(date('Y-m-d H:m:i', $time), date('Y-m-d H:m:i', $prev_time));
-//        var_dump($prev_data);
-//        exit();
     }
 
     protected function _create_data_summary($data): object

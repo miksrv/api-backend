@@ -72,19 +72,6 @@ class SensorData extends Model
             ->getResult();
     }
 
-    function get_sensor_by_min_date($date)
-    {
-        $this->table = getenv('database.table.meteo_data');
-
-        return $this->db
-            ->table($this->table)
-            ->orderBy('item_timestamp', 'ASC')
-            ->where('DATE(item_timestamp) >', $date)
-            ->limit(1)
-            ->get()
-            ->getResult();
-    }
-
     function get_day_order()
     {
         $this->table = getenv('database.table.meteo_data');
@@ -92,11 +79,6 @@ class SensorData extends Model
         return $this->db
             ->table($this->table)
             ->orderBy('item_timestamp', 'ASC')
-//            ->getWhere([
-//                'YEAR(item_timestamp)'  => $year,
-//                'MONTH(item_timestamp)' => $month,
-//                'DAY(item_timestamp)'   => $day])
-            //->getResult()
             ->limit(1)
             ->get()
             ->getResult();
