@@ -4,11 +4,11 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
+#TODO: DEPRECATED
+
 class ControllerData extends Model
 {
     protected $table      = '';
-    protected $primaryKey = 'item_id';
-    protected $returnType = 'object';
 
     protected $db;
 

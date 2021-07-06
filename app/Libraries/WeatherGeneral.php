@@ -2,9 +2,7 @@
 
 namespace App\Libraries;
 
-/**
- * WeatherGeneral library
- */
+#TODO: DEPRECATED
 
 class WeatherGeneral {
 

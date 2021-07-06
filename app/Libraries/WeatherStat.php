@@ -2,9 +2,7 @@
 
 namespace App\Libraries;
 
-/**
- * WeatherStat library
- */
+#TODO: DEPRECATED
 
 class WeatherStat {
 

@@ -7,8 +7,6 @@ use CodeIgniter\Validation\ValidationInterface;
 class FITsData extends Model
 {
     protected $table      = '';
-    protected $primaryKey = 'file_id';
-    protected $returnType = 'object';
 
     protected $db;
 

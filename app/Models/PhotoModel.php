@@ -8,7 +8,6 @@ class PhotoModel extends Model
 {
     protected $table      = '';
     protected $primaryKey = 'photo_obj';
-    protected $returnType = 'object';
 
     protected $db;
 

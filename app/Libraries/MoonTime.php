@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-# DEPRECATED
+#TODO: DEPRECATED
 
 /******************************************************************************
  * The following is a PHP implementation of the JavaScript code found at:      *

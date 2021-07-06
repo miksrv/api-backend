@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-# DEPRECATED
+#TODO: DEPRECATED
 
 /**
  * Moon phase calculation class
