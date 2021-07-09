@@ -26,7 +26,7 @@ class Vk extends BaseController
                 $api_url  = self::API_URL . 'wall.get?domain=' . getenv('app.vkapi.domain')
                           . '&v=' . getenv('app.vkapi.version')
                           . '&access_token=' . getenv('app.vkapi.token')
-                          . '&count=' . ($limit ? $limit : 4)
+                          . '&count=' . ($limit ?: 4)
                           . '&offset=' . ($offset ? $offset : 0);
                 $response = $client->get($api_url, ['headers' => [CURLOPT_ENCODING => '']]);
                 $this->response->setStatusCode(200)->setJSON( json_decode($response->getJSON()) )->send();

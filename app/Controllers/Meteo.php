@@ -50,11 +50,7 @@ class Meteo extends BaseController
                 break;
 
             case 'statistic' :
-                ini_set('display_errors', 1);
-                ini_set('display_startup_errors', 1);
-                error_reporting(E_ALL);
-
-                $_cache_name = "statistic_{$period->start}_{$period->end}";
+                $_cache_name = "statistic_$period->start_$period->end";
                 $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5; // 1 month or 5 min
 
                 if ( ! $_archive_data = json_decode(cache($_cache_name)))
@@ -68,7 +64,7 @@ class Meteo extends BaseController
                 break;
 
             case 'csv' :
-                $_cache_name = "csv_{$period->start}_{$period->end}";
+                $_cache_name = "csv_$period->start_$period->end";
                 $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5;
 
                 if ( ! $_archive_data = json_decode(cache($_cache_name)))
@@ -87,7 +83,7 @@ class Meteo extends BaseController
                 break;
 
             case 'archive' :
-                $_cache_name = "archive_{$period->start}_{$period->end}";
+                $_cache_name = "archive_$period->start_$period->end";
 
                 $Sensors->set_range($period->start, $period->end);
 
@@ -111,7 +107,7 @@ class Meteo extends BaseController
     protected function _download_csv($name, $data)
     {
         header("Content-Description: File Transfer");
-        header("Content-Disposition: attachment; filename={$name}");
+        header("Content-Disposition: attachment; filename=$name");
         header("Content-Type: application/csv; ");
 
         $file = fopen('php://output', 'w');
@@ -137,7 +133,8 @@ class Meteo extends BaseController
         return date('Y-m-d', $date);
     }
 
-    protected function _get_period() {
+    protected function _get_period(): object
+    {
         $date_start = $this->_get_date('date_start');
         $date_end   = $this->_get_date('date_end');
 

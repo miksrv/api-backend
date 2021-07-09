@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\Response;
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
@@ -58,9 +60,9 @@ class Relay extends BaseController
      * @param $data string
      * @param int $code HTTP string code
      * @param $method class method
-     * @return \CodeIgniter\HTTP\Response
+     * @return Response
      */
-    protected function _response(string $data, $code = 400, $method): \CodeIgniter\HTTP\Response
+    protected function _response(string $data, $code = 400, $method): Response
     {
         if ($code !== 200)
         {
