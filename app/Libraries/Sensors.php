@@ -12,7 +12,6 @@ class Sensors {
 
     protected $dataset = [];
     protected $update;
-    protected $period;
     protected $range;
     protected $dewpoint;
 
@@ -26,12 +25,12 @@ class Sensors {
      * param['dewpoint'] => ['t' => ..., 'h' => ...]
      * @param array $param
      */
-    function __construct($param = [])
+    function __construct(array $param = [])
     {
         helper(['transform', 'calculate']);
 
         $this->_dataModel = model('App\Models\SensorData');
-        $this->_source    = isset($param['source']) ? $param['source'] : 'meteo';
+        $this->_source    = $param['source'] ?? 'meteo';
 
         $this->dataset  = (isset($param['dataset']) && is_array($param['dataset'])) ? $param['dataset'] : [];
         $this->dewpoint = (isset($param['dewpoint']['t']) && isset($param['dewpoint']['h'])) ? $param['dewpoint'] : null;
@@ -127,8 +126,8 @@ class Sensors {
         unset($_dataTmp);
 
         return (object) [
-            'date_start' => (isset($this->range->start) ? $this->range->start : null),
-            'date_end'   => (isset($this->range->end) ? $this->range->end : null),
+            'date_start' => ($this->range->start ?? null),
+            'date_end'   => ($this->range->end ?? null),
             'data'       => $result
         ];
     }
@@ -302,7 +301,7 @@ class Sensors {
         return (int) $interval->format($differenceFormat);
     }
     
-    private function _get_period_сoefficient() {
+    private function _get_period_coefficient() {
         $period = $this->_get_period();
 
         if ($period === 0) return 5*60; // 5 min
@@ -357,7 +356,7 @@ class Sensors {
         $_temp_wr  = create_wind_rose_array(); // Wind rose array
         $_temp_wr_total = 0; // Wind rose count items
         
-        $period = $this->_get_period_сoefficient();
+        $period = $this->_get_period_coefficient();
 
         foreach ($this->_data as $num => $item)
         {
@@ -468,7 +467,7 @@ class Sensors {
     }
 
     // Определяем частоту, с какого направления дует ветер
-    protected function _insert_wind_direction($_temp_wd, $_temp_wr, $_temp_wr_total, $_result)
+    protected function _insert_wind_direction($_temp_wd, $_temp_wr, $_temp_wr_total, $_result): array
     {
         $_tmp = $_temp_wd;
 

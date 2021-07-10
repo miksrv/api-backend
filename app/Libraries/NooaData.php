@@ -16,7 +16,7 @@ class NooaData {
     /**
      * Weather forecast from OpenWeatherMap service
      */
-    public function get_kindex()
+    public function get_kindex(): object
     {
 
         if ( ! $kindex = cache('kindex'))
@@ -49,7 +49,7 @@ class NooaData {
         ];
     }
 
-    protected function _make_graph_data($data)
+    protected function _make_graph_data($data): array
     {
         $result = [];
 

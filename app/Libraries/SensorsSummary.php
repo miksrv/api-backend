@@ -18,7 +18,7 @@ class SensorsSummary {
         helper(['transform', 'calculate']);
 
         $this->_dataModel = model('App\Models\SensorData');
-        $this->_source    = isset($param['source']) ? $param['source'] : 'meteo';
+        $this->_source    = $param['source'] ?? 'meteo';
     }
 
     /**
@@ -64,7 +64,7 @@ class SensorsSummary {
         }
     }
 
-    protected function _get_last_sensor_data($time)
+    protected function _get_last_sensor_data($time): object
     {
         $time = strtotime($time . ' +1 hours');
         $data = $this->_dataModel->get_sensor_by_hour(
@@ -87,9 +87,11 @@ class SensorsSummary {
      * Если вдруг не получается выцепить значение следующего часа,
      * то берется час предидущего дня
      * @param $time
+     * @param $days
+     * @return mixed
      */
     protected function _get_empty_value($time, $days) {
-        $prev_time = strtotime(date('Y-m-d H:i:s', $time) . " -{$days} days");
+        $prev_time = strtotime(date('Y-m-d H:i:s', $time) . " -$days days");
         $prev_data = $this->_dataModel->get_sensor_by_hour(
             date('Y', $prev_time),
             date('m', $prev_time),

@@ -131,7 +131,7 @@ class FITLibrary
             'Blue' => 'b', 'Ha' => 'h', 'OIII' => 'o', 'SII' => 's'
         ];
 
-        foreach ($dataFITs as $key => $row)
+        foreach ($dataFITs as $row)
         {
 
             if ($row->item_frame != 'Light') {
@@ -195,7 +195,7 @@ class FITLibrary
 
         $_dataTmp = $result = [];
 
-        foreach ($dataFITs as $key => $row)
+        foreach ($dataFITs as $row)
         {
             $_date = date('d', strtotime($row->item_date_obs));
 
