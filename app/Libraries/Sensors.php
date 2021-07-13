@@ -194,13 +194,25 @@ class Sensors {
     {
         if (empty($this->_data)) return ;
 
-        $temp  = [];
+        $temp = [];
+        $max = $min = (object) ['val' => 0, 'time' => 0];
 
         foreach ($this->_data as $item)
         {
             $_data  = json_decode($item->item_raw_data);
+            $_extr  = json_decode($item->item_extreme_values);
             $_value = null;
             $_time  = strtotime($item->item_timestamp);
+
+            foreach ($_extr as $sensor => $val) {
+                if ($sensor !== 't1') continue;
+
+                if ($val->max > $max->val)
+                    $max = (object) ['val' => $val->max, 'time' => $_time * 1000];
+
+                if ($val->min < $min->val)
+                    $min = (object) ['val' => $val->min, 'time' => $_time * 1000];
+            }
 
             foreach ($_data as $sensor => $val) {
                 if ($sensor !== 't1') continue;
@@ -216,7 +228,11 @@ class Sensors {
             date('Y-m-d H:i:s', strtotime($this->_data[array_key_last($this->_data)]->item_timestamp))
         );
 
-        return $this->_data = $temp;
+        return $this->_data = (object) [
+            'chart' => $temp,
+            'max'   => $max,
+            'min'   => $min
+        ];
     }
 
     protected function _make_summary_data()
