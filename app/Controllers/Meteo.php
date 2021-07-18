@@ -42,7 +42,14 @@ class Meteo extends BaseController
                 break;
 
             case 'heatmap' :
-                $this->response->setJSON( $Sensors->heatmap() )->send();
+                $_cache_time = 60*60;
+                if ( ! $_archive_data = json_decode(cache('heatmap')))
+                {
+                    $_archive_data = $Sensors->heatmap();
+                    cache()->save('heatmap', json_encode($_archive_data), $_cache_time);
+                }
+
+                $this->response->setJSON( $_archive_data )->send();
                 break;
 
             case 'summary' :

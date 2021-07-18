@@ -208,10 +208,10 @@ class Sensors {
                 if ($sensor !== 't1') continue;
 
                 if ($val->max > $max->val)
-                    $max = (object) ['val' => $val->max, 'time' => $_time * 1000];
+                    $max = (object) ['val' => $val->max, 'time' => $_time];
 
                 if ($val->min < $min->val)
-                    $min = (object) ['val' => $val->min, 'time' => $_time * 1000];
+                    $min = (object) ['val' => $val->min, 'time' => $_time];
             }
 
             foreach ($_data as $sensor => $val) {
