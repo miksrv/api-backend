@@ -57,7 +57,7 @@ class Meteo extends BaseController
                 break;
 
             case 'statistic' :
-                $_cache_name = "statistic_$period->start_$period->end";
+                $_cache_name = "statistic_{$period->start}_{$period->end}";
                 $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5; // 1 month or 5 min
 
                 if ( ! $_archive_data = json_decode(cache($_cache_name)))
