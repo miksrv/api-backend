@@ -35,7 +35,7 @@ class SensorData extends Model
     {
         $table = getenv('database.table.astro_data');
         return $this->db->table($table)
-            ->where("item_timestamp < DATE_SUB(NOW(), INTERVAL 14 DAY)")
+            ->where("item_timestamp < DATE_SUB(NOW(), INTERVAL 7 DAY)")
             ->delete();
     }
 

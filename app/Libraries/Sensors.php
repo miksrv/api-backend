@@ -52,7 +52,7 @@ class Sensors {
     }
 
     /**
-     * Remove old entites
+     * Remove old entites for astro sensors
      * @return mixed
      */
     function clear_old_entries()

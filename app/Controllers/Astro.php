@@ -97,6 +97,7 @@ class Astro extends BaseController
                     if (is_array($dataset)) $Sensors->set_dataset($dataset);
                 }
 
+                $Sensors->clear_old_entries();
                 $this->response->setJSON( $Sensors->statistic() )->send();
                 break;
 
