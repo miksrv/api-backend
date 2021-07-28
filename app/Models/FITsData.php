@@ -6,7 +6,7 @@ use CodeIgniter\Validation\ValidationInterface;
 
 class FITsData extends Model
 {
-    protected $table      = '';
+    protected $table = '';
 
     protected $db;
 
@@ -22,6 +22,7 @@ class FITsData extends Model
         return $this->db->table($this->table)->insert($data);
     }
 
+    #TODO Optimize select
     function get_all()
     {
         return $this->db->table($this->table)->get()->getResult();
@@ -32,6 +33,7 @@ class FITsData extends Model
         return $this->db->table($this->table)->delete(['file_id' => $id]);
     }
 
+    #TODO Optimize select
     function get_by_name($name)
     {
         return $this->db
@@ -41,6 +43,7 @@ class FITsData extends Model
                 ->getResult();
     }
 
+    #TODO Optimize select
     function get_by_date($date)
     {
         return $this->db
@@ -50,12 +53,24 @@ class FITsData extends Model
             ->getResult();
     }
 
+    #TODO Optimize select
     function get_by_month($month, $year)
     {
         return $this->db
             ->table($this->table)
             ->orderBy('item_date_obs', 'DESC')
             ->getWhere(['YEAR(item_date_obs)' => $year, 'MONTH(item_date_obs)' => $month])
+            ->getResult();
+    }
+
+
+    function get_by_month_period($month_period)
+    {
+        return $this->db
+            ->table($this->table)
+            ->select('item_exptime, item_date_obs, item_object')
+            ->orderBy('item_date_obs', 'DESC')
+            ->getWhere("item_date_obs > DATE_SUB(NOW(), INTERVAL $month_period MONTH)")
             ->getResult();
     }
 }

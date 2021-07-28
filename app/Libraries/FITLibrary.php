@@ -102,6 +102,53 @@ class FITLibrary
         return true;
     }
 
+    public function month_period_statistic() {
+        $dataFITs = $this->_dataModel->get_by_month_period(10);
+
+        $result = [];
+        ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
+        foreach ($dataFITs as $item)
+        {
+            $date = date('Y-m', strtotime($item->item_date_obs));
+            $date = strtotime($date) * 1000;
+
+            if ( ! isset($result[$date]))
+                $result[$date] = [
+                    'exp'    => $item->item_exptime,
+                    'count'  => 1,
+                    'object' => [$item->item_object]
+                ];
+
+            else {
+                $_obj = $result[$date]['object'];
+                if (! in_array($item->item_object, $_obj))
+                    array_push($_obj, $item->item_object);
+
+                $result[$date] = [
+                    'exp'    => $result[$date]['exp'] + $item->item_exptime,
+                    'count'  => $result[$date]['count'] + 1,
+                    'object' => $_obj
+                ];
+            }
+        }
+
+        $exp  = [];
+        $shot = [];
+        $obj  = [];
+
+        foreach ($result as $key => $val)
+        {
+            $exp[]  = [$key, round($val['exp'] / 60 / 60, 1)];
+            $shot[] = [$key, $val['count']];
+            $obj[]  = [$key, count($val['object'])];
+        }
+
+        return (object) [
+            'exp'  => $exp,
+            'shot' => $shot,
+            'obj'  => $obj
+        ];
+    }
 
     /**
      * Creates a summary array of objects and general statistics for frames, exposure

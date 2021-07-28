@@ -43,11 +43,6 @@ class Astro extends BaseController
         }
     }
 
-    public function clear()
-    {
-        $Sensors = new Sensors(['source' => 'astro']);
-    }
-
     public function delete($action)
     {
         $token = $this->request->getHeaderLine('authtoken');
@@ -99,6 +94,10 @@ class Astro extends BaseController
 
                 $Sensors->clear_old_entries();
                 $this->response->setJSON( $Sensors->statistic() )->send();
+                break;
+
+            case 'period_statistic' :
+                $this->response->setJSON( $FITData->month_period_statistic() )->send();
                 break;
 
             // FIT file data
