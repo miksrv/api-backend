@@ -4,7 +4,6 @@ namespace App\Controllers;
 use App\Libraries\UserAuth;
 
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
 
 /**
@@ -47,7 +46,7 @@ class Auth extends BaseController
 
     function logout()
     {
-        $UserAuth = new \UserAuth();
+        $UserAuth = new UserAuth();
 
         $UserAuth->do_logout($this->request->getHeaderLine('AuthToken'));
 
@@ -56,7 +55,7 @@ class Auth extends BaseController
 
     function check()
     {
-        $UserAuth = new \UserAuth();
+        $UserAuth = new UserAuth();
 
         $token = $this->request->getHeaderLine('AuthToken');
 
