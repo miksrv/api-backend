@@ -45,7 +45,7 @@ class Photo extends BaseController
 
             case 'download' :
                 $objName  = $request->getVar('name', FILTER_SANITIZE_STRING);
-                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/photo/' . $objName . '.jpg';
+                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/public/photo/' . $objName . '.jpg';
 
                 if ( ! file_exists($filePath)) {
                     throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();

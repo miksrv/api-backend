@@ -102,6 +102,10 @@ class FITLibrary
         return true;
     }
 
+    /**
+     * Return JSON data for statistic chart - observatory last 10 month exp, frames and object per month
+     * @return object
+     */
     public function month_period_statistic() {
         $dataFITs = $this->_dataModel->get_by_month_period(10);
 
@@ -346,18 +350,9 @@ class FITLibrary
     protected function _get_statistic($data): object
     {
         $total_exp  = 0;
-        $enable_key = [
-            'file_id', 'item_file_name', 'item_exptime', 'item_date_obs',
-            'item_filter', 'item_object', 'item_ccd_temp', 'item_offset', 'item_gain'
-        ];
 
         foreach ($data as $row)
-        {
-            foreach ($row as $key => $item)
-                if ( ! in_array($key, $enable_key)) unset($row->$key);
-
             $total_exp += $row->item_exptime;
-        }
 
         return (object) [
             'status' => count($data) > 0,
