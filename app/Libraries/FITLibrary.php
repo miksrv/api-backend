@@ -216,7 +216,7 @@ class FITLibrary
             'statistic' => $objects,
             'frames'    => $total_frame,
             'exposure'  => $total_exp,
-            'filesize'  => format_bytes($total_frame * self::FIT_FILE_SIZE, 'gb'),
+            'filesize'  => format_bytes($total_frame * self::FIT_FILE_SIZE, 'mb'),
             'objects'   => count($objects)
         ];
     }
@@ -359,9 +359,8 @@ class FITLibrary
             'stats'  => $this->get_fits_stat($data),
             'files'  => $data,
 
-            'data'      => $data, // DEPRECATED!
             'exposure'  => $total_exp,
-            'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'gb'),
+            'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'mb'),
             'frames'    => count($data),
         ];
     }
