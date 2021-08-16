@@ -20,10 +20,10 @@ class FITLibrary
 
     /**
      * Create array from input FITS file data
-     * @param $data
+     * @param array $data
      * @return array
      */
-    function create_fit_array($data): array
+    function create_fit_array(array $data): array
     {
         return $this->fit_header = [
             'file_id'        => md5($data->FILE_NAME),
@@ -74,10 +74,10 @@ class FITLibrary
 
     /**
      * Delete file by ID
-     * @param $fileID
+     * @param string $fileID
      * @return bool
      */
-    public function delete($fileID): bool
+    public function delete(string $fileID): bool
     {
         if (empty($fileID)) return false;
 
@@ -91,7 +91,7 @@ class FITLibrary
      * @param array $data
      * @return bool
      */
-    function save_fit($data = []): bool
+    function save_fit(array $data = []): bool
     {
         $data = (empty($data) ? $this->fit_header : $data);
 
@@ -281,10 +281,10 @@ class FITLibrary
 
     /**
      * Return statistic by object name
-     * @param $name
+     * @param string $name
      * @return object
      */
-    function statistics_object($name): object
+    function statistics_object(string $name): object
     {
         return $this->_get_statistic($this->_dataModel->get_by_name($name));
     }
@@ -292,11 +292,11 @@ class FITLibrary
     /**
      * Create stats array from input FITS data
      * @param array $data
-     * @param null $name
-     * @param null $shooting_date
+     * @param string $name
+     * @param string $shooting_date
      * @return object
      */
-    function get_fits_stat($data = [], $name = null, $shooting_date = null): object
+    function get_fits_stat(array $data = [], string $name = null, string $shooting_date = null): object
     {
         if (empty($data)) $data = $this->_dataModel->get_by_name($name);
 

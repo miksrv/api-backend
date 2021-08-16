@@ -49,7 +49,13 @@ class NooaData {
         ];
     }
 
-    protected function _make_graph_data($data): array
+    /**
+     * Create data chart from array
+     * @param array $data
+     * @return array
+     * @throws \Exception
+     */
+    protected function _make_graph_data(array $data): array
     {
         $result = [];
 

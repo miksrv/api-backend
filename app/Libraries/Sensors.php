@@ -72,9 +72,9 @@ class Sensors {
 
     /**
      * Set dataset (sensor names for SELECT)
-     * @param $dataset
+     * @param array $dataset
      */
-    function set_dataset($dataset)
+    function set_dataset(array $dataset)
     {
         $this->dataset = (! empty($dataset) && is_array($dataset)) ? $dataset : [];
     }
@@ -132,6 +132,10 @@ class Sensors {
         ];
     }
 
+    /**
+     * Create chart data for heatmap
+     * @return object
+     */
     function heatmap(): object
     {
         $this->set_range(
@@ -171,13 +175,21 @@ class Sensors {
         return $this->_response();
     }
 
+    /**
+     * Return CSV file data
+     * @return array|null
+     */
     function csv(): ?array
     {
         $this->_fetchData();
 
         return $this->_make_csv_data();
     }
-    
+
+    /**
+     * Create HTTP response object data
+     * @return object
+     */
     protected function _response(): object
     {
         return (object) [
@@ -190,6 +202,10 @@ class Sensors {
         ];
     }
 
+    /**
+     * Return created heatmap data
+     * @return object|void
+     */
     protected function _make_heatmap_data()
     {
         if (empty($this->_data)) return ;
@@ -280,35 +296,36 @@ class Sensors {
 
         $this->_data = $temp;
     }
-    
-    protected function _get_range($range)
+
+    /**
+     * Create data range
+     * @param object $range
+     */
+    protected function _get_range(object $range)
     {
-        #todo Пофиксить баг с отсчетом 12 часов от текущего времени
         $this->range = (object) [
             'start' => ($range->start === $range->end) ? date('Y-m-d H:i:s', strtotime($range->start . '-12 hours')) 
                                                        : date('Y-m-d 00:00:00', strtotime($range->start)),
             'end'   => date('Y-m-d ' . ($range->end < date('Y-m-d') ? '23:59:59' : date('H:i:s')), strtotime($range->end)),
         ];
-        
-        // echo '<pre>';
-        // var_dump($range);
-        // var_dump($this->range);
-        // exit();
     }
-    
+
     /**
-     *
-// '%y Year %m Month %d Day %h Hours %i Minute %s Seconds'        =>  1 Year 3 Month 14 Day 11 Hours 49 Minute 36 Seconds
-// '%y Year %m Month %d Day'                                    =>  1 Year 3 Month 14 Days
-// '%m Month %d Day'                                            =>  3 Month 14 Day
-// '%d Day %h Hours'                                            =>  14 Day 11 Hours
-// '%d Day'                                                        =>  14 Days
-// '%h Hours %i Minute %s Seconds'                                =>  11 Hours 49 Minute 36 Seconds
-// '%i Minute %s Seconds'                                        =>  49 Minute 36 Seconds
-// '%h Hours                                                    =>  11 Hours
-// '%a Days                                                        =>  468 Days
+     * Return period (in days) for date range
+     * '%y Year %m Month %d Day %h Hours %i Minute %s Seconds' =>  1 Year 3 Month 14 Day 11 Hours 49 Minute 36 Seconds
+     * '%y Year %m Month %d Day'                               =>  1 Year 3 Month 14 Days
+     * '%m Month %d Day'                                       =>  3 Month 14 Day
+     * '%d Day %h Hours'                                       =>  14 Day 11 Hours
+     * '%d Day'                                                =>  14 Days
+     * '%h Hours %i Minute %s Seconds'                         =>  11 Hours 49 Minute 36 Seconds
+     * '%i Minute %s Seconds'                                  =>  49 Minute 36 Seconds
+     * '%h Hours                                               =>  11 Hours
+     * '%a Days                                                =>  468 Days
+     * @param string $differenceFormat
+     * @return int
      */
-    private function _get_period($differenceFormat = '%a') {
+    private function _get_period(string $differenceFormat = '%a'): int
+    {
         $datetime1 = date_create($this->range->start);
         $datetime2 = date_create($this->range->end);
        
@@ -316,8 +333,12 @@ class Sensors {
        
         return (int) $interval->format($differenceFormat);
     }
-    
-    private function _get_period_coefficient() {
+
+    /**
+     * Returns the coefficient for calculating the average value of the summation of sensor data
+     * @return float|int
+     */
+    private function _get_period_coefficient(): int {
         $period = $this->_get_period();
 
         if ($period === 0) return 5*60; // 5 min
@@ -328,6 +349,10 @@ class Sensors {
         return 60*60*24; // 24 hour
     }
 
+    /**
+     * Create and return CSV data
+     * @return array
+     */
     protected function _make_csv_data(): array
     {
         $_headers = ['date'];
@@ -359,7 +384,6 @@ class Sensors {
 
     /**
      * Make and return graph data array
-     * @param $period string (today|yesterday|week|month)
      * @return array|void
      */
     protected function _make_graph_data(): array
@@ -440,10 +464,10 @@ class Sensors {
 
     /**
      * Creates an initial array of sensor data
-     * @param $sensor_array
+     * @param array $sensor_array
      * @return array
      */
-    protected function _make_initial_data($sensor_array): array
+    protected function _make_initial_data(array $sensor_array): array
     {
         $_tmp = [];
 
@@ -466,7 +490,7 @@ class Sensors {
     /**
      * JSON decode, return object
      * Inserted some data in first sensors array elements
-     * @param $raw_input string
+     * @param string $raw_input
      * @return object
      */
     protected function _insert_additional_data(string $raw_input): object
@@ -482,8 +506,15 @@ class Sensors {
         return $_tmp;
     }
 
-    // Определяем частоту, с какого направления дует ветер
-    protected function _insert_wind_direction($_temp_wd, $_temp_wr, $_temp_wr_total, $_result): array
+    /**
+     * Determine the frequency from which direction the wind blows
+     * @param array $_temp_wd
+     * @param $_temp_wr
+     * @param $_temp_wr_total
+     * @param $_result
+     * @return array
+     */
+    protected function _insert_wind_direction(array $_temp_wd, $_temp_wr, $_temp_wr_total, $_result): array
     {
         $_tmp = $_temp_wd;
 
@@ -497,6 +528,9 @@ class Sensors {
         return $_result;
     }
 
+    /**
+     * Set the global variable from data from database
+     */
     private function _fetchData()
     {
         $getSummary = false;
