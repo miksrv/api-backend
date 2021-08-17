@@ -8,7 +8,7 @@ use App\Libraries\NooaData;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
-
+ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 /**
  * Class Meteo
  * @package App\Controllers

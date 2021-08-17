@@ -464,10 +464,10 @@ class Sensors {
 
     /**
      * Creates an initial array of sensor data
-     * @param array $sensor_array
+     * @param $sensor_array
      * @return array
      */
-    protected function _make_initial_data(array $sensor_array): array
+    protected function _make_initial_data($sensor_array): array
     {
         $_tmp = [];
 
