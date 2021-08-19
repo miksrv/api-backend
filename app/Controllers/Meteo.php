@@ -8,7 +8,7 @@ use App\Libraries\NooaData;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
-ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
+
 /**
  * Class Meteo
  * @package App\Controllers
@@ -71,7 +71,7 @@ class Meteo extends BaseController
                 break;
 
             case 'csv' :
-                $_cache_name = "csv_$period->start_$period->end";
+                $_cache_name = "csv_{$period->start}_{$period->end}";
                 $_cache_time = $period->end < date('Y-m-d') ? 2592000 : 60*5;
 
                 if ( ! $_archive_data = json_decode(cache($_cache_name)))
@@ -90,7 +90,8 @@ class Meteo extends BaseController
                 break;
 
             case 'archive' :
-                $_cache_name = "archive_$period->start_$period->end";
+                ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
+                $_cache_name = "archive_{$period->start}_{$period->end}";
 
                 $Sensors->set_range($period->start, $period->end);
 

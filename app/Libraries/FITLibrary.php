@@ -20,10 +20,10 @@ class FITLibrary
 
     /**
      * Create array from input FITS file data
-     * @param array $data
+     * @param object $data
      * @return array
      */
-    function create_fit_array(array $data): array
+    function create_fit_array(object $data): array
     {
         return $this->fit_header = [
             'file_id'        => md5($data->FILE_NAME),
