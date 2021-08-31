@@ -43,10 +43,13 @@ class Meteo extends BaseController
 
             case 'heatmap' :
                 $_cache_time = 60*60;
-                if ( ! $_archive_data = json_decode(cache('heatmap')))
+                $_cache_name = "heatmap_{$period->start}_{$period->end}";
+
+                if ( ! $_archive_data = json_decode(cache($_cache_name)))
                 {
+                    $Sensors->set_range($period->start, $period->end);
                     $_archive_data = $Sensors->heatmap();
-                    cache()->save('heatmap', json_encode($_archive_data), $_cache_time);
+                    cache()->save($_cache_name, json_encode($_archive_data), $_cache_time);
                 }
 
                 $this->response->setJSON( $_archive_data )->send();
@@ -90,7 +93,6 @@ class Meteo extends BaseController
                 break;
 
             case 'archive' :
-                ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
                 $_cache_name = "archive_{$period->start}_{$period->end}";
 
                 $Sensors->set_range($period->start, $period->end);

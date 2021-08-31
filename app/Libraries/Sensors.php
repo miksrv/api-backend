@@ -138,11 +138,6 @@ class Sensors {
      */
     function heatmap(): object
     {
-        $this->set_range(
-            date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . '-10 months')),
-            date('Y-m-d H:i:s')
-        );
-
         $this->_fetchData();
 
         if (empty($this->_data)) return (object) [];
@@ -211,7 +206,7 @@ class Sensors {
         if (empty($this->_data)) return ;
 
         $temp = [];
-        $max = $min = (object) ['val' => 0, 'time' => 0];
+        $max = $min = (object) ['val' => null, 'time' => null];
 
         foreach ($this->_data as $item)
         {
@@ -222,6 +217,9 @@ class Sensors {
 
             foreach ($_extr as $sensor => $val) {
                 if ($sensor !== 't1') continue;
+
+                if ($max->val === null) $max->val = $val->max;
+                if ($min->val === null) $min->val = $val->min;
 
                 if ($val->max > $max->val)
                     $max = (object) ['val' => $val->max, 'time' => $_time];

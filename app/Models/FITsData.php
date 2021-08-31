@@ -35,7 +35,7 @@ class FITsData extends Model
     {
         return $this->db
             ->table($this->table)
-            ->select('item_frame, item_exptime, item_object, item_filter')
+            ->select('item_frame, item_exptime, item_object, item_filter, item_date_obs')
             ->get()
             ->getResult();
     }

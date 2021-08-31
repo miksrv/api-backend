@@ -181,6 +181,7 @@ class FITLibrary
             'Luminance' => 'l', 'Red' => 'r', 'Green' => 'g',
             'Blue' => 'b', 'Ha' => 'h', 'OIII' => 'o', 'SII' => 's'
         ];
+        $last_date = null;
 
         foreach ($dataFITs as $row)
         {
@@ -206,6 +207,7 @@ class FITLibrary
                 $key = key($objects);
             }
 
+            $objects[$key]['date']   = (! isset($objects[$key]['date']) || $objects[$key]['date'] < $row->item_date_obs ? $row->item_date_obs : $objects[$key]['date']);
             $objects[$key]['total'] += $row->item_exptime;
             $objects[$key]['frame'] += 1;
 
