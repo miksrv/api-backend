@@ -37,7 +37,6 @@ class OpenWeather {
 
             $foreacst = $response->getBody();
 
-            // Save into the cache for 10 minutes
             cache()->save('foreacst', $foreacst, self::CACHE_TIME);
         }
 

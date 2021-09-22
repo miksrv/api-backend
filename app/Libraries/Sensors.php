@@ -533,12 +533,8 @@ class Sensors {
     {
         $getSummary = false;
 
-        if ($this->_get_period() > 30 && $this->_source === 'meteo') {
-//            $this->range->start = $this->_default_start;
-//            $this->range->end   = $this->_default_end;
-
+        if ($this->_get_period() > 30 && $this->_source === 'meteo')
             $getSummary = true;
-        }
 
         $this->_data = $this->_dataModel->get_period($this->_source, $this->range, $getSummary);
     }

@@ -110,7 +110,7 @@ class FITLibrary
         $dataFITs = $this->_dataModel->get_by_month_period(10);
 
         $result = [];
-        ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
+
         foreach ($dataFITs as $item)
         {
             $date = date('Y-m', strtotime($item->item_date_obs));
@@ -181,7 +181,6 @@ class FITLibrary
             'Luminance' => 'l', 'Red' => 'r', 'Green' => 'g',
             'Blue' => 'b', 'Ha' => 'h', 'OIII' => 'o', 'SII' => 's'
         ];
-        $last_date = null;
 
         foreach ($dataFITs as $row)
         {
