@@ -18,6 +18,10 @@ class PhotoModel extends Model
         $this->table = getenv('database.table.astro_photo');
     }
 
+    /**
+     * Return all photos array
+     * @return mixed
+     */
     function get_all()
     {
         return $this->db
@@ -27,6 +31,11 @@ class PhotoModel extends Model
                 ->getResult();
     }
 
+    /**
+     * Return photo object by name
+     * @param $name
+     * @return mixed
+     */
     function get_by_name($name)
     {
         return $this->db
