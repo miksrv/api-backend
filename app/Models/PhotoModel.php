@@ -19,6 +19,34 @@ class PhotoModel extends Model
     }
 
     /**
+     * NEW
+     * @return mixed
+     */
+    function get_count()
+    {
+        return $this->db
+            ->table('astro_photo_new')
+            ->countAll();
+    }
+
+    /**
+     * NEW
+     * @param int $limit
+     * @return mixed
+     */
+    function get_list(int $limit = 0)
+    {
+        $build = $this->db
+            ->table('astro_photo_new')
+            ->select(['photo_obj', 'photo_title', 'photo_text', 'photo_date', 'photo_category', 'photo_file', 'photo_file_ext'])
+            ->orderBy('photo_date', 'DESC');
+
+        if ($limit !== 0) $build->limit($limit);
+
+        return $build->get()->getResult();
+    }
+
+    /**
      * Return all photos array
      * @return mixed
      */

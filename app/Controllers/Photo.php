@@ -22,6 +22,21 @@ class Photo extends BaseController
         switch ($action)
         {
             // Summary data on sensors of the observatory
+            case 'count' :
+                $this->response->setJSON( $PhotoModel->get_count() )->send();
+                break;
+
+            // Summary data on sensors of the observatory
+            case 'last' :
+                $this->response->setJSON( $PhotoModel->get_list(4) )->send();
+                break;
+
+            // Summary data on sensors of the observatory
+            case 'all_list' :
+                $this->response->setJSON( $PhotoModel->get_list() )->send();
+                break;
+
+            // Summary data on sensors of the observatory
             case 'list' :
                 $this->response->setJSON( $PhotoModel->get_all() )->send();
                 break;
