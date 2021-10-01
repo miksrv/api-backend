@@ -2,6 +2,7 @@
 
 use App\Models\PhotoModel;
 use App\Libraries\FITLibrary;
+use App\Libraries\Photo as libPhoto;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -12,6 +13,12 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
  */
 class Photo extends BaseController
 {
+    protected $_libPhoto;
+
+    function __construct()
+    {
+        $this->_libPhoto = new libPhoto();
+    }
 
     function get($action)
     {
@@ -21,42 +28,48 @@ class Photo extends BaseController
 
         switch ($action)
         {
-            // Summary data on sensors of the observatory
-            case 'count' :
-                $this->response->setJSON( $PhotoModel->get_count() )->send();
-                break;
-
-            // Summary data on sensors of the observatory
-            case 'last' :
-                $this->response->setJSON( $PhotoModel->get_list(4) )->send();
-                break;
-
-            // Summary data on sensors of the observatory
-            case 'all_list' :
-                $this->response->setJSON( $PhotoModel->get_list() )->send();
-                break;
-
-            // Summary data on sensors of the observatory
             case 'list' :
-                $this->response->setJSON( $PhotoModel->get_all() )->send();
-                break;
+                $this->response->setJSON([
+                    'status' => true,
+                    'photos' => $this->_libPhoto->get_list()
+                ])->send();
 
-            // Statistics for graphing by sensors in the observatory
+                break;
+                
             case 'item' :
-                $objName   = $request->getVar('name', FILTER_SANITIZE_STRING);
-                $dataPhoto = $PhotoModel->get_by_name($objName);
+                $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
+                $varDate  = $request->getVar('date', FILTER_SANITIZE_STRING);
+                $objPhoto = $this->_libPhoto->get_item($varName, $varDate);
 
-                if (empty($dataPhoto)) {
-                    log_message('error', '[' . __METHOD__ . '] Empty photo data (' . json_encode($objName) . ')');
-                    $this->response->setJSON(['status' => false])->send();
-                    exit();
-                }
+                if (!$objPhoto) $this->_send_error(__METHOD__, "Empty photo data ($varName)");
 
-                $dataPhoto[0]->status = true;
-                $dataPhoto[0]->stats  = $FITData->get_fits_stat([], $objName, $dataPhoto[0]->photo_date);
+                $this->response->setJSON(array_merge(['status' => true], $objPhoto))->send();
 
-                $this->response->setJSON($dataPhoto[0])->send();
                 break;
+                
+                
+
+//            // Summary data on sensors of the observatory
+//            case 'list' :
+//                $this->response->setJSON( $PhotoModel->get_all() )->send();
+//                break;
+//
+//            // Statistics for graphing by sensors in the observatory
+//            case 'item' :
+//                $objName   = $request->getVar('name', FILTER_SANITIZE_STRING);
+//                $dataPhoto = $PhotoModel->get_by_name($objName);
+//
+//                if (empty($dataPhoto)) {
+//                    log_message('error', '[' . __METHOD__ . '] Empty photo data (' . json_encode($objName) . ')');
+//                    $this->response->setJSON(['status' => false])->send();
+//                    exit();
+//                }
+//
+//                $dataPhoto[0]->status = true;
+//                $dataPhoto[0]->stats  = $FITData->get_fits_stat([], $objName, $dataPhoto[0]->photo_date);
+//
+//                $this->response->setJSON($dataPhoto[0])->send();
+//                break;
 
             case 'download' :
                 $objName  = $request->getVar('name', FILTER_SANITIZE_STRING);
@@ -75,5 +88,19 @@ class Photo extends BaseController
 
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
+    }
+
+    /**
+     * Send JSON error
+     * @param string $method
+     * @param string $log
+     */
+    protected function _send_error(string $method, string $log)
+    {
+        log_message('error', '[' . $method . '] ' . $log);
+
+        $this->response->setJSON(['status' => false])->send();
+
+        exit();
     }
 }
