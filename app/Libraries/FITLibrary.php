@@ -2,6 +2,8 @@
 
 namespace App\Libraries;
 
+use App\Models\FITS as modelFITS;
+
 class FITLibrary
 {
     protected $fit_header = [];
@@ -13,7 +15,7 @@ class FITLibrary
 
     function __construct()
     {
-        $this->_dataModel = model('App\Models\FITsData');
+        $this->_dataModel = new modelFITS();
         
         helper(['transform']);
     }
@@ -293,8 +295,8 @@ class FITLibrary
     /**
      * Create stats array from input FITS data
      * @param array $data
-     * @param string $name
-     * @param string $shooting_date
+     * @param string|null $name
+     * @param string|null $shooting_date
      * @return object
      */
     function get_fits_stat(array $data = [], string $name = null, string $shooting_date = null): object
@@ -335,10 +337,10 @@ class FITLibrary
 
     /**
      * Return statistic by shooting date
-     * @param $date format (Y-m-d)
+     * @param string $date format (Y-m-d)
      * @return object
      */
-    function statistics_day($date): object
+    function statistics_day(string $date): object
     {
         return $this->_get_statistic($this->_dataModel->get_by_date($date));
     }

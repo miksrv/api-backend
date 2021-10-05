@@ -1,7 +1,6 @@
 <?php namespace App\Controllers;
 
 use App\Models\PhotoModel;
-use App\Libraries\FITLibrary;
 use App\Libraries\Photo as libPhoto;
 
 header('Access-Control-Allow-Origin: *');
@@ -22,8 +21,6 @@ class Photo extends BaseController
 
     function get($action)
     {
-        $PhotoModel = new PhotoModel();
-        $FITData = new FITLibrary();
         $request = \Config\Services::request();
 
         switch ($action)
@@ -35,7 +32,7 @@ class Photo extends BaseController
                 ])->send();
 
                 break;
-                
+
             case 'item' :
                 $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
                 $varDate  = $request->getVar('date', FILTER_SANITIZE_STRING);
@@ -46,48 +43,34 @@ class Photo extends BaseController
                 $this->response->setJSON(array_merge(['status' => true], $objPhoto))->send();
 
                 break;
-                
-                
-
-//            // Summary data on sensors of the observatory
-//            case 'list' :
-//                $this->response->setJSON( $PhotoModel->get_all() )->send();
-//                break;
-//
-//            // Statistics for graphing by sensors in the observatory
-//            case 'item' :
-//                $objName   = $request->getVar('name', FILTER_SANITIZE_STRING);
-//                $dataPhoto = $PhotoModel->get_by_name($objName);
-//
-//                if (empty($dataPhoto)) {
-//                    log_message('error', '[' . __METHOD__ . '] Empty photo data (' . json_encode($objName) . ')');
-//                    $this->response->setJSON(['status' => false])->send();
-//                    exit();
-//                }
-//
-//                $dataPhoto[0]->status = true;
-//                $dataPhoto[0]->stats  = $FITData->get_fits_stat([], $objName, $dataPhoto[0]->photo_date);
-//
-//                $this->response->setJSON($dataPhoto[0])->send();
-//                break;
 
             case 'download' :
-                $objName  = $request->getVar('name', FILTER_SANITIZE_STRING);
-                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/public/photo/' . $objName . '.jpg';
+                $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
+                $objPhoto = $this->_libPhoto->get_item($varName);
 
-                if ( ! file_exists($filePath)) {
-                    throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-                }
+                if (!$objPhoto) $this->_send_error(__METHOD__, "Empty photo data ($varName)");
 
-                header('Content-Type: application/octet-stream');
-                header("Content-Transfer-Encoding: Binary"); 
-                header("Content-disposition: attachment; filename=\"" . basename($filePath) . "\""); 
-                readfile($filePath); 
+                $this->_download($_SERVER['DOCUMENT_ROOT'] . '/public/photo/' . $objPhoto['photo']->file . '.jpg');
 
                 break;
 
             default : throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
+    }
+
+    /**
+     * Response application/octet-stream for file download
+     * @param string $filePath
+     */
+    protected function _download(string $filePath) {
+        if ( ! file_exists($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        header('Content-Type: application/octet-stream');
+        header("Content-Transfer-Encoding: Binary");
+        header("Content-disposition: attachment; filename=\"" . basename($filePath) . "\"");
+        readfile($filePath);
     }
 
     /**

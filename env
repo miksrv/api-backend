@@ -93,7 +93,7 @@ database.table.meteo_data = meteo_data
 database.table.astro_data = astro_sensors
 database.table.astro_fits = astro_fits
 database.table.astro_fits = astro_fits
-database.table.astro_photo = astro_photo
+database.table.astro_photos = astro_photos
 database.table.astro_catalog = astro_catalog
 
 #--------------------------------------------------------------------

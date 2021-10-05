@@ -22,8 +22,7 @@ class Photo extends Model
     {
         parent::__construct($db, $validation);
 
-//        $this->table = getenv('database.table.astro_photo');
-        $this->table = 'astro_photos';
+        $this->table = getenv('database.table.astro_photos');
     }
 
     /**
