@@ -4,7 +4,7 @@ namespace App\Libraries;
 
 use App\Models\FITS as modelFITS;
 
-class FITLibrary
+class FITS
 {
     protected $fit_header = [];
     protected $_dataModel;

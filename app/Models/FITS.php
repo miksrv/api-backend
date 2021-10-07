@@ -9,6 +9,7 @@ class FITS extends Model
     protected $table = '';
 
     protected $keyDate = 'item_date_obs';
+    protected $keyName = 'item_object';
 
     protected $db;
 
@@ -63,7 +64,7 @@ class FITS extends Model
             ->select('file_id, item_file_name, item_exptime, item_date_obs, 
                       item_filter, item_object, item_ccd_temp, item_offset, item_gain')
             ->orderBy($this->keyDate, 'DESC')
-            ->getWhere(['item_object' => $name])
+            ->getWhere([$this->keyName => $name])
             ->getResult();
     }
 

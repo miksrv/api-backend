@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Libraries\FITLibrary;
+use App\Libraries\FITS as libFITS;
 use App\Libraries\Sensors;
 
 header('Access-Control-Allow-Origin: *');
@@ -16,10 +16,15 @@ header('Access-Control-Allow-Headers: Accept, AuthToken, Content-Type');
 class Astro extends BaseController
 {
 
+    protected $_libFITS;
+
+    function __construct()
+    {
+        $this->_libFITS = new libFITS();
+    }
+
     function set($action)
     {
-        $FITData = new FITLibrary();
-
         switch ($action)
         {
             case 'fit_object':
@@ -32,8 +37,8 @@ class Astro extends BaseController
                     return $this->response->setStatusCode(400)->setJSON(['status' => false])->send();
                 }
 
-                $FITData->create_fit_array($RAWData);
-                $FITData->save_fit();
+                $this->_libFITS->create_fit_array($RAWData);
+                $this->_libFITS->save_fit();
 
                 $this->response->setJSON(['status' => true])->send();
 
@@ -54,12 +59,10 @@ class Astro extends BaseController
             exit();
         }
 
-        $FITData = new FITLibrary();
-
         switch ($action) {
             case 'fit' :
                 $fileID = $this->request->getGet('id');
-                $result = $FITData->delete($fileID);
+                $result = $this->_libFITS->delete($fileID);
 
                 if ($result)
                     log_message('info', '[' .  __METHOD__ . '] FIT file (' . $fileID . ') deleted');
@@ -73,7 +76,6 @@ class Astro extends BaseController
     {
         $request = \Config\Services::request();
         $Sensors = new Sensors(['source' => 'astro']);
-        $FITData = new FITLibrary();
 
         switch ($action)
         {
@@ -97,12 +99,12 @@ class Astro extends BaseController
                 break;
 
             case 'period_statistic' :
-                $this->response->setJSON( $FITData->month_period_statistic() )->send();
+                $this->response->setJSON( $this->_libFITS->month_period_statistic() )->send();
                 break;
 
             // FIT file data
             case 'fit_stats' :
-                $this->response->setJSON( $FITData->statistics() )->send();
+                $this->response->setJSON( $this->_libFITS->statistics() )->send();
                 break;
 
             // FIT file data
@@ -119,21 +121,21 @@ class Astro extends BaseController
                         $year  = date('Y', $date);
                     }
                 }
-                $this->response->setJSON( $FITData->archive($month, $year) )->send();
+                $this->response->setJSON( $this->_libFITS->archive($month, $year) )->send();
                 break;
 
             // FIT file data for object by name
             case 'fit_object_stats' :
                 $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
 
-                $this->response->setJSON( $FITData->statistics_object($objName) )->send();
+                $this->response->setJSON( $this->_libFITS->statistics_object($objName) )->send();
                 break;
 
             // FIT file data for object by name
             case 'day_object_stats' :
                 $objDate = $request->getVar('date', FILTER_SANITIZE_STRING);
 
-                $this->response->setJSON( $FITData->statistics_day($objDate) )->send();
+                $this->response->setJSON( $this->_libFITS->statistics_day($objDate) )->send();
                 break;
 
             // FIT file data

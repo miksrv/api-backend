@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-use App\Libraries\FITLibrary;
+use App\Libraries\FITS as libFITS;
 use App\Models\Photo as modelPhoto;
 use App\Models\Catalog as modelCatalog;
 
@@ -17,7 +17,7 @@ class Photo
         $this->_modelPhoto   = new modelPhoto();
         $this->_modelCatalog = new modelCatalog();
 
-        $this->_libFITS = new FITLibrary();
+        $this->_libFITS = new libFITS();
     }
 
     /**
