@@ -46,7 +46,8 @@ class Photo extends BaseController
 
             case 'download' :
                 $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
-                $objPhoto = $this->_libPhoto->get_item($varName);
+                $varDate  = $request->getVar('date', FILTER_SANITIZE_STRING);
+                $objPhoto = $this->_libPhoto->get_item($varName, $varDate);
 
                 if (!$objPhoto) $this->_send_error(__METHOD__, "Empty photo data ($varName)");
 
