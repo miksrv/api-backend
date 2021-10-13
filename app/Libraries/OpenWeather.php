@@ -15,6 +15,7 @@ class OpenWeather {
 
     /**
      * Weather forecast from OpenWeatherMap service
+     * @return object
      */
     public function get_forecast(): object
     {

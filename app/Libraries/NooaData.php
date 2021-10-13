@@ -2,6 +2,8 @@
 
 namespace App\Libraries;
 
+use Exception;
+
 /**
  * nooa.gov library
  */
@@ -15,6 +17,8 @@ class NooaData {
 
     /**
      * Weather forecast from OpenWeatherMap service
+     * @return object
+     * @throws Exception
      */
     public function get_kindex(): object
     {
@@ -53,7 +57,7 @@ class NooaData {
      * Create data chart from array
      * @param array $data
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _make_graph_data(array $data): array
     {

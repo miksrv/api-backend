@@ -22,7 +22,8 @@ class SensorsSummary {
     }
 
     /**
-     * @throws \Exception
+     * Create summary data
+     * @throws Exception
      */
     function run()
     {
@@ -49,6 +50,10 @@ class SensorsSummary {
         $this->run();
     }
 
+    /**
+     * @param $date
+     * @throws Exception
+     */
     protected function _get_date_diff_hours($date)
     {
         $date1 = new \DateTime($date);
@@ -64,6 +69,10 @@ class SensorsSummary {
         }
     }
 
+    /**
+     * @param $time
+     * @return object
+     */
     protected function _get_last_sensor_data($time): object
     {
         $time = strtotime($time . ' +1 hours');
@@ -105,6 +114,10 @@ class SensorsSummary {
         return $prev_data;
     }
 
+    /**
+     * @param $data
+     * @return object
+     */
     protected function _create_data_summary($data): object
     {
         $count  = 0;
@@ -141,6 +154,11 @@ class SensorsSummary {
         return (object) ['summary' => $summary, 'extreme' => $extreme];
     }
 
+    /**
+     * @param $dataset
+     * @param $time
+     * @return mixed
+     */
     protected function _set_total($dataset, $time)
     {
         if (empty($dataset->summary) || empty($dataset->extreme))
@@ -156,21 +174,39 @@ class SensorsSummary {
         return $this->_dataModel->set_total($summary, $extreme, $time);
     }
 
+    /**
+     * @return mixed
+     */
     function get_last_hour() {
         return $this->_dataModel->get_day_order();
         //return $this->_dataModel->get_day();
     }
 
+    /**
+     * @param $year
+     * @param $month
+     * @param $day
+     * @param $hour
+     * @return mixed
+     */
     function get_day($year, $month, $day, $hour)
     {
         return $this->_dataModel->get_hour($year, $month, $day, $hour);
     }
 
+    /**
+     * @return mixed
+     */
     function get_last_total()
     {
         return $this->_dataModel->get_last_total();
     }
 
+    /**
+     * @param $data
+     * @param $time
+     * @return mixed
+     */
     function set_total($data, $time)
     {
         return $this->_dataModel->set_total($data, $time);

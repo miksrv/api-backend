@@ -22,6 +22,7 @@ class Photo
 
     /**
      * Get full photos list (array) with catalog object information
+     * @return array
      */
     function get_list(): array
     {

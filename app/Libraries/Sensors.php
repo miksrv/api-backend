@@ -79,6 +79,10 @@ class Sensors {
         $this->dataset = (! empty($dataset) && is_array($dataset)) ? $dataset : [];
     }
 
+    /**
+     * Create archive array for calendar
+     * @return object
+     */
     function archive(): object
     {
         $this->_fetchData();
@@ -161,6 +165,10 @@ class Sensors {
         return $this->_response();
     }
 
+    /**
+     * Create statistics array for charts
+     * @return object|null
+     */
     function statistic(): ?object
     {
         $this->_fetchData();
@@ -249,6 +257,11 @@ class Sensors {
         ];
     }
 
+
+    /**
+     * Rebuild $this->data for charts
+     * @throws Exception
+     */
     protected function _make_summary_data()
     {
         if (empty($this->_data)) return ;
