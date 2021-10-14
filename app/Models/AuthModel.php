@@ -7,8 +7,6 @@ use CodeIgniter\Validation\ValidationInterface;
 class AuthModel extends Model
 {
     protected $table      = '';
-    protected $primaryKey = 'item_id';
-    protected $returnType = 'object';
 
     protected $db;
 

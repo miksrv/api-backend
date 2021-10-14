@@ -8,7 +8,7 @@ use CodeIgniter\Validation\ValidationInterface;
 
 class Catalog extends Model
 {
-    protected $table   = '';
+    protected $table = '';
 
     protected $keyName     = 'object_name';
     protected $keyTitle    = 'object_title';
