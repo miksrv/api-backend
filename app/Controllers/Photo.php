@@ -2,6 +2,7 @@
 
 use App\Models\PhotoModel;
 use App\Libraries\Photo as libPhoto;
+use App\Libraries\FITS as libFITS;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -13,10 +14,12 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 class Photo extends BaseController
 {
     protected $_libPhoto;
+    protected $_libFITS;
 
     function __construct()
     {
         $this->_libPhoto = new libPhoto();
+        $this->_libFITS  = new libFITS();
     }
 
     function get($action)
@@ -37,10 +40,11 @@ class Photo extends BaseController
                 $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
                 $varDate  = $request->getVar('date', FILTER_SANITIZE_STRING);
                 $objPhoto = $this->_libPhoto->get_item($varName, $varDate);
+                $objData  = $this->_libFITS->get_object_info($varName);
 
                 if (!$objPhoto) $this->_send_error(__METHOD__, "Empty photo data ($varName)");
 
-                $this->response->setJSON(array_merge(['status' => true], $objPhoto))->send();
+                $this->response->setJSON(array_merge(['status' => true], $objPhoto, $objData))->send();
 
                 break;
 

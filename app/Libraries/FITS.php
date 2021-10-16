@@ -105,6 +105,26 @@ class FITS
     }
 
     /**
+     * Return object info by name
+     * @param string $name
+     * @return array
+     */
+    public function get_object_info(string $name): array
+    {
+        $arrData   = $this->_dataModel->get_by_name($name);
+        $objReturn = ['object' => null];
+
+        if (empty($arrData)) return $objReturn;
+
+        $objReturn['object'] = [
+            'ra'  => $arrData[0]->item_ra,
+            'dec' => $arrData[0]->item_dec
+        ];
+
+        return $objReturn;
+    }
+
+    /**
      * Return JSON data for statistic chart - observatory last 10 month exp, frames and object per month
      * @return object
      */

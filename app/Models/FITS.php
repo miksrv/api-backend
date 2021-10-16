@@ -62,7 +62,8 @@ class FITS extends Model
         return $this->db
             ->table($this->table)
             ->select('file_id, item_file_name, item_exptime, item_date_obs, 
-                      item_filter, item_object, item_ccd_temp, item_offset, item_gain')
+                      item_filter, item_object, item_ccd_temp, item_offset, item_gain,
+                      item_dec, item_ra')
             ->orderBy($this->keyDate, 'DESC')
             ->getWhere([$this->keyName => $name])
             ->getResult();
