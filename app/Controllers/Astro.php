@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Libraries\FITS as libFITS;
+use App\Libraries\Photo as libPhoto;
 use App\Libraries\Sensors;
 
 header('Access-Control-Allow-Origin: *');
@@ -17,10 +18,12 @@ class Astro extends BaseController
 {
 
     protected $_libFITS;
+    protected $_libPhoto;
 
     function __construct()
     {
-        $this->_libFITS = new libFITS();
+        $this->_libPhoto = new libPhoto();
+        $this->_libFITS  = new libFITS();
     }
 
     function set($action)
@@ -102,7 +105,7 @@ class Astro extends BaseController
                 $this->response->setJSON( $this->_libFITS->month_period_statistic() )->send();
                 break;
 
-            // FIT file data
+            // Get statistic data for all files by all period
             case 'fit_stats' :
                 $this->response->setJSON( $this->_libFITS->statistics() )->send();
                 break;
@@ -125,10 +128,19 @@ class Astro extends BaseController
                 break;
 
             // FIT file data for object by name
+            # TODO add 404 error
             case 'fit_object_stats' :
-                $objName = $request->getVar('name', FILTER_SANITIZE_STRING);
+                $varName  = $request->getVar('name', FILTER_SANITIZE_STRING);
+                $objData  = $this->_libFITS->statistics_object($varName);
+                $objInfo  = $this->_libFITS->get_object_info($varName);
+                $objPhoto = $this->_libPhoto->get_item($varName, null, true);
 
-                $this->response->setJSON( $this->_libFITS->statistics_object($objName) )->send();
+                $this->response->setJSON( array_merge(
+                    ['status' => true],
+                    ['photos' => ($objPhoto['archive'] ?? [])],
+                    (array) $objInfo,
+                    (array) $objData,
+                ))->send();
                 break;
 
             // FIT file data for object by name

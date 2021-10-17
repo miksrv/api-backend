@@ -54,9 +54,10 @@ class Photo
      * Get photo item with catalog information, statistic and archive
      * @param string $name
      * @param string|null $date
+     * @param bool $archive Return all photos in archive
      * @return array
      */
-    function get_item(string $name, string $date = null): array
+    function get_item(string $name, string $date = null, $archive = false): array
     {
         $arrPhotos = $this->_modelPhoto->get_by_name($name);
         $objResult = [];
@@ -74,7 +75,7 @@ class Photo
         ];
 
         foreach ($arrPhotos as $key => $item) {
-            if (($key === 0 && empty($date)) || (! empty($date) && $date === $item->photo_date))
+            if ( !$archive && (($key === 0 && empty($date)) || (! empty($date) && $date === $item->photo_date)))
             {
                 $objResult['photo'] = $this->_create_photo_object($item);;
 

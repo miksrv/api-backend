@@ -236,11 +236,11 @@ class FITS
         }
 
         return (object) [
-            'statistic' => $objects,
             'frames'    => $total_frame,
             'exposure'  => $total_exp,
-            'filesize'  => format_bytes($total_frame * self::FIT_FILE_SIZE, 'mb'),
-            'objects'   => count($objects)
+            'filesize'  => round($total_frame * self::FITS_FILE_SIZE),
+            'objects'   => count($objects),
+            'statistic' => $objects,
         ];
     }
 
@@ -297,8 +297,8 @@ class FITS
         }
         
         return (object) [
-            'status'   => true,
-            'data'     => $result
+            'status' => true,
+            'data'   => $result
         ];
     }
 
@@ -382,6 +382,7 @@ class FITS
             'stats'  => $this->get_fits_stat($data),
             'files'  => $data,
 
+            // #DEPRECATED
             'exposure'  => $total_exp,
             'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'mb'),
             'frames'    => count($data),
