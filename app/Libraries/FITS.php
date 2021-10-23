@@ -381,11 +381,6 @@ class FITS
             'status' => count($data) > 0,
             'stats'  => $this->get_fits_stat($data),
             'files'  => $data,
-
-            // #DEPRECATED
-            'exposure'  => $total_exp,
-            'filesize'  => format_bytes(count($data) * self::FIT_FILE_SIZE, 'mb'),
-            'frames'    => count($data),
         ];
     }
 }
