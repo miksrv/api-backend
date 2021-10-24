@@ -10,7 +10,6 @@ class FITS
     protected $_dataModel;
 
     // FIT file size in byte for 16 bit mask
-    const FIT_FILE_SIZE = 32785920; #DEPRECATED
     const FITS_FILE_SIZE = 32.78592; // in Mb
 
     function __construct()
