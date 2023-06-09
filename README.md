@@ -1,3 +1,6 @@
+### ⚠️ DEPRECATED ⚠️
+See [DYI Arduino Weather Station](https://github.com/miksrv/arduino-weather-station) Repository
+
 # CodeIgniter 4 Application Starter
 
 ## What is CodeIgniter?
